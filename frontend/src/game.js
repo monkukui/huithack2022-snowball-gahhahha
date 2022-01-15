@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 export const Game = (enemyName) => {
   socket.on("fall", (jsonString) => {
-    console.log("fall")
+    console.log("fall");
     const data = jsonString.data;
     const x = data.x;
     const y = data.y;
@@ -11,18 +11,20 @@ export const Game = (enemyName) => {
 
   socket.on("enemyPosition", (data) => {
     const { x, y } = data.data;
-    console.log(`enemy moved to ${x}, ${y}`)
+    console.log(`enemy moved to ${x}, ${y}`);
     // const data = JSON.parse(jsonString).data;
     syncAnotherPlayer(x, y);
   });
 
-  socket.on("disconnected", () => { });
+  socket.on("disconnected", () => {});
   socket.on("over", (data) => {
     console.log(data);
     console.log("over! 負けたか勝ったかどっちかな～");
   });
 
-  camera.position = new THREE.Vector3(0, -200, 500);
+  camera.position.y = -200;
+  camera.position.z = 200;
+
   camera.rotation.x = 1;
 
   const snowBallInitialZ = 150;
@@ -46,6 +48,7 @@ export const Game = (enemyName) => {
   const playerHeight = 20;
   const ballRadius = 14;
   const generateSnowBallTicks = 35;
+  const emitPositionTicks = 1;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
   const keyInput = {
@@ -66,7 +69,7 @@ export const Game = (enemyName) => {
   };
   makeFloor();
 
-  const makePlayer = () => {
+  const makePlayer1 = () => {
     const geometry = new THREE.CylinderGeometry(
       playerRadius,
       playerRadius,
@@ -81,9 +84,9 @@ export const Game = (enemyName) => {
     cylinder.position.z = playerHeight / 2;
     scene.add(cylinder);
   };
-  makePlayer();
+  makePlayer1();
 
-  const makeAnotherPlayer = () => {
+  const makePlayer2 = () => {
     const geometry = new THREE.CylinderGeometry(
       playerRadius,
       playerRadius,
@@ -98,7 +101,19 @@ export const Game = (enemyName) => {
 
     scene.add(cylinder);
   };
-  makeAnotherPlayer();
+  makePlayer2();
+
+  const getSelf = () => {
+    return scene.getObjectByName(
+      playerType === "host" ? "cylinder1" : "cylinder2"
+    );
+  };
+
+  const getEnemy = () => {
+    return scene.getObjectByName(
+      playerType === "guest" ? "cylinder1" : "cylinder2"
+    );
+  };
 
   const setupKeyInput = () => {
     document.onkeydown = function (e) {
@@ -137,7 +152,7 @@ export const Game = (enemyName) => {
   setupKeyInput();
 
   const tickMoveByKey = () => {
-    var cylinder1 = scene.getObjectByName("cylinder1");
+    var self = getSelf();
     const vector2 = {
       x: 0,
       y: 0,
@@ -168,8 +183,8 @@ export const Game = (enemyName) => {
       vector2.y += 1;
     }
     vector2.normalize();
-    cylinder1.position.x += vector2.x * speedFactor;
-    cylinder1.position.y += vector2.y * speedFactor;
+    self.position.x += vector2.x * speedFactor;
+    self.position.y += vector2.y * speedFactor;
   };
 
   const tickGenerateSnowBalls = () => {
@@ -221,35 +236,32 @@ export const Game = (enemyName) => {
   };
 
   const tickWallBlock = () => {
-    var player = scene.getObjectByName("cylinder1");
-    if (player.position.x > floorScale / 2 - playerRadius) {
-      player.position.x = floorScale / 2 - playerRadius;
+    var self = getSelf();
+    if (self.position.x > floorScale / 2 - playerRadius) {
+      self.position.x = floorScale / 2 - playerRadius;
     }
-    if (player.position.x < -floorScale / 2 + playerRadius) {
-      player.position.x = -floorScale / 2 + playerRadius;
+    if (self.position.x < -floorScale / 2 + playerRadius) {
+      self.position.x = -floorScale / 2 + playerRadius;
     }
-    if (player.position.y > floorScale / 2 - playerRadius) {
-      player.position.y = floorScale / 2 - playerRadius;
+    if (self.position.y > floorScale / 2 - playerRadius) {
+      self.position.y = floorScale / 2 - playerRadius;
     }
-    if (player.position.y < -floorScale / 2 + playerRadius) {
-      player.position.y = -floorScale / 2 + playerRadius;
+    if (self.position.y < -floorScale / 2 + playerRadius) {
+      self.position.y = -floorScale / 2 + playerRadius;
     }
   };
 
   const tickSnowBallCollision = () => {
-    var player = scene.getObjectByName("cylinder1");
+    var self = getSelf();
     var balls = scene.children.filter((child) => child.name === "snowball");
     balls.forEach((ball) => {
-      if (
-        ball.position.distanceTo(player.position) <
-        playerRadius + ballRadius
-      ) {
+      if (ball.position.distanceTo(self.position) < playerRadius + ballRadius) {
         console.log("hit");
       }
     });
   };
 
-  const tickDeleteSnowBall = () => {
+  const tickDeleteSnowball = () => {
     var balls = scene.children.filter((child) => child.name === "snowball");
     balls.forEach((ball) => {
       if (ball.position.z < -10) {
@@ -259,9 +271,9 @@ export const Game = (enemyName) => {
   };
 
   const syncAnotherPlayer = (x, y) => {
-    var cylinder2 = scene.getObjectByName("cylinder2");
-    cylinder2.position.x = x;
-    cylinder2.position.y = y;
+    var enemy = getEnemy();
+    enemy.position.x = x;
+    enemy.position.y = y;
   };
 
   const syncGenerateSnowball = (x, y) => {
@@ -275,7 +287,16 @@ export const Game = (enemyName) => {
     sphere.name = "snowball";
   };
 
-  let count = 0
+  const emitSelfPosition = (x, y) => {
+    var self = getSelf();
+
+    socket.emit("position", {
+      room: room,
+      position: { x: self.position.x, y: self.position.y },
+    });
+  };
+
+  let count = 0;
 
   function animate() {
     requestAnimationFrame(animate);
@@ -290,25 +311,20 @@ export const Game = (enemyName) => {
     }
     tickSnowballsAndShadow();
 
-    if (count === 10) {
-      count = 0
-      // console.log("let's sync position!")
-      // for debug
-      const x = Math.random() * 200 - 100
-      const y = Math.random() * 200 - 100
-      socket.emit("position", { room: room, position: { x: x, y: y } })
-      // TODO: sync position
+    if (frameCount % emitPositionTicks === 0) {
+      emitSelfPosition();
     }
-    count++
+    count++;
+
     renderer.render(scene, camera);
   }
   animate();
   let snowBallCount = 0; // 何ターン目か。
   requestFallSnowBall = (timeOut, count) => {
-    socket.emit('requestFall', { room: room, count: count })
-    setTimeout(requestAnimationFrame(), timeOut) // TODO: どんどんはやく
-  }
-  requestFallSnowBall(2000, count++)
+    socket.emit("requestFall", { room: room, count: count });
+    setTimeout(requestAnimationFrame(), timeOut); // TODO: どんどんはやく
+  };
+  requestFallSnowBall(2000, count++);
 };
 
 window.game = Game;
