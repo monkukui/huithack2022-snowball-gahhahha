@@ -2,7 +2,6 @@ import * as THREE from "three";
 
 export const Game = (enemyName) => {
   socket.on("fall", (jsonString) => {
-    console.log("fall");
     const data = jsonString.data;
     data.forEach((s) => {
       const { x, y } = s;
@@ -30,24 +29,25 @@ export const Game = (enemyName) => {
 
   const snowBallInitialZ = 150;
 
-  const materialBlue = new THREE.MeshBasicMaterial({
-    color: 0x0000ff,
+  const materialPlayer1 = new THREE.MeshBasicMaterial({
+    color: 0xf26690,
   });
-  const materialSky = new THREE.MeshBasicMaterial({
-    color: 0x005555,
+  const materialPlayer2 = new THREE.MeshBasicMaterial({
+    color: 0xde864e,
   });
 
   const materialFloor = new THREE.MeshBasicMaterial({
-    color: 0xc05050,
+    color: 0xd3d7db,
   });
 
   const materialShadow = new THREE.MeshBasicMaterial({
-    color: 0x202020,
+    color: 0x8b8b8b,
   });
 
   const playerScale = 30;
   const ballRadius = 14;
   const generateSnowBallTicks = 35;
+  const requestSnowBallTicks = 6 * 60;
   const emitPositionTicks = 3;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
@@ -95,52 +95,54 @@ export const Game = (enemyName) => {
       playerScale * 0.4,
       32
     );
+    const material = materialPlayer1;
 
-    const head = new THREE.Mesh(headGeometry, materialSky);
+    const head = new THREE.Mesh(headGeometry, material);
     head.position.z = playerScale * 0.9;
 
-    const neck = new THREE.Mesh(neckGeometry, materialBlue);
+    const neck = new THREE.Mesh(neckGeometry, material);
     neck.position.z = playerScale * 0.8;
     neck.rotation.x = Math.PI / 2;
 
-    const torso = new THREE.Mesh(torsoGeometry, materialBlue);
+    const torso = new THREE.Mesh(torsoGeometry, material);
     torso.position.z = playerScale * 0.6;
     torso.rotation.x = Math.PI / 2;
 
-    const arm_l = new THREE.Mesh(armGeometry, materialBlue);
+    const arm_l = new THREE.Mesh(armGeometry, material);
     arm_l.position.x = -playerScale * 0.15;
     arm_l.position.z = playerScale * 0.6;
     arm_l.rotation.x = Math.PI / 2;
     arm_l.rotation.z = Math.PI * -0.1;
 
-    const arm_r = new THREE.Mesh(armGeometry, materialBlue);
+    const arm_r = new THREE.Mesh(armGeometry, material);
     arm_r.position.x = playerScale * 0.15;
     arm_r.position.z = playerScale * 0.6;
     arm_r.rotation.x = Math.PI / 2;
     arm_r.rotation.z = Math.PI * 0.1;
 
-    const leg_l = new THREE.Mesh(legGeometry, materialBlue);
+    const leg_l = new THREE.Mesh(legGeometry, material);
     leg_l.position.x = -playerScale * 0.07;
     leg_l.position.z = playerScale * 0.2;
     leg_l.rotation.x = Math.PI / 2;
     leg_l.rotation.z = Math.PI * -0.05;
 
-    const leg_r = new THREE.Mesh(legGeometry, materialBlue);
+    const leg_r = new THREE.Mesh(legGeometry, material);
     leg_r.position.x = playerScale * 0.07;
     leg_r.position.z = playerScale * 0.2;
     leg_r.rotation.x = Math.PI / 2;
     leg_r.rotation.z = Math.PI * 0.05;
 
-    const p1 = new THREE.Group();
-    p1.add(head);
-    p1.add(neck);
-    p1.add(torso);
-    p1.add(arm_l);
-    p1.add(arm_r);
-    p1.add(leg_l);
-    p1.add(leg_r);
-    p1.name = "p1";
-    scene.add(p1);
+    const group = new THREE.Group();
+    group.add(head);
+    group.add(neck);
+    group.add(torso);
+    group.add(arm_l);
+    group.add(arm_r);
+    group.add(leg_l);
+    group.add(leg_r);
+    group.name = "p1";
+    window.p1 = group;
+    scene.add(group);
   };
   makePlayer1();
 
@@ -170,36 +172,38 @@ export const Game = (enemyName) => {
       32
     );
 
-    const head = new THREE.Mesh(headGeometry, materialSky);
+    const material = materialPlayer2;
+
+    const head = new THREE.Mesh(headGeometry, material);
     head.position.z = playerScale * 0.9;
 
-    const neck = new THREE.Mesh(neckGeometry, materialBlue);
+    const neck = new THREE.Mesh(neckGeometry, material);
     neck.position.z = playerScale * 0.8;
     neck.rotation.x = Math.PI / 2;
 
-    const torso = new THREE.Mesh(torsoGeometry, materialBlue);
+    const torso = new THREE.Mesh(torsoGeometry, material);
     torso.position.z = playerScale * 0.6;
     torso.rotation.x = Math.PI / 2;
 
-    const arm_l = new THREE.Mesh(armGeometry, materialBlue);
+    const arm_l = new THREE.Mesh(armGeometry, material);
     arm_l.position.x = -playerScale * 0.15;
     arm_l.position.z = playerScale * 0.6;
     arm_l.rotation.x = Math.PI / 2;
     arm_l.rotation.z = Math.PI * -0.1;
 
-    const arm_r = new THREE.Mesh(armGeometry, materialBlue);
+    const arm_r = new THREE.Mesh(armGeometry, material);
     arm_r.position.x = playerScale * 0.15;
     arm_r.position.z = playerScale * 0.6;
     arm_r.rotation.x = Math.PI / 2;
     arm_r.rotation.z = Math.PI * 0.1;
 
-    const leg_l = new THREE.Mesh(legGeometry, materialBlue);
+    const leg_l = new THREE.Mesh(legGeometry, material);
     leg_l.position.x = -playerScale * 0.07;
     leg_l.position.z = playerScale * 0.2;
     leg_l.rotation.x = Math.PI / 2;
     leg_l.rotation.z = Math.PI * -0.05;
 
-    const leg_r = new THREE.Mesh(legGeometry, materialBlue);
+    const leg_r = new THREE.Mesh(legGeometry, material);
     leg_r.position.x = playerScale * 0.07;
     leg_r.position.z = playerScale * 0.2;
     leg_r.rotation.x = Math.PI / 2;
@@ -223,7 +227,7 @@ export const Game = (enemyName) => {
   };
 
   const getEnemy = () => {
-    return scene.getObjectByName(playerType === "guest" ? "p2" : "p1");
+    return scene.getObjectByName(playerType === "host" ? "p2" : "p1");
   };
 
   const setupKeyInput = () => {
@@ -304,7 +308,7 @@ export const Game = (enemyName) => {
       snowballMeshQuality,
       snowballMeshQuality
     );
-    var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    var material = new THREE.MeshBasicMaterial({ color: snowColorCode });
     var sphere = new THREE.Mesh(geometry, material);
     const boundBoxVertical = floorScale - ballRadius * 2;
     sphere.position.x = Math.random() * boundBoxVertical - boundBoxVertical / 2;
@@ -331,7 +335,6 @@ export const Game = (enemyName) => {
         ball.position.z -=
           ((snowBallInitialZ - ball.position.z + 1) / 20) * snowballSpeedFactor;
         if (ball.position.z < 0) {
-          console.log("removed");
           scene.remove(ball);
         }
       };
@@ -392,7 +395,7 @@ export const Game = (enemyName) => {
       snowballMeshQuality,
       snowballMeshQuality
     );
-    var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    var material = new THREE.MeshBasicMaterial({ color: snowColorCode });
     var sphere = new THREE.Mesh(geometry, material);
     sphere.position.x = x;
     sphere.position.y = y;
@@ -428,6 +431,14 @@ export const Game = (enemyName) => {
     // if (frameCount % generateSnowBallTicks === 0) {
     //   tickGenerateSnowBalls();
     // }
+    let snowBallCount = 0; // 何ターン目か。
+
+    if (frameCount % requestSnowBallTicks === 0) {
+      if (playerType === "host") {
+        tickRequestFallSnowBall(snowBallCount);
+        snowBallCount++;
+      }
+    }
     tickSnowballsAndShadow();
 
     if (frameCount % emitPositionTicks === 0) {
@@ -437,17 +448,9 @@ export const Game = (enemyName) => {
     renderer.render(scene, camera);
   }
   animate();
-  let snowBallCount = 0; // 何ターン目か。
-  const requestFallSnowBall = (timeOut, count) => {
-    const before = Date.now();
+  const tickRequestFallSnowBall = (count) => {
     socket.emit("requestFall", { room: room, count: count });
-    console.log(Date.now() - before);
-
-    setTimeout(() => requestFallSnowBall(timeOut, count++), timeOut); // TODO: どんどんはやく
   };
-  if (playerType === "host") {
-    requestFallSnowBall(1500, count++);
-  }
 };
 
 window.game = Game;

@@ -33,6 +33,9 @@ const opponentType = {
   guest: "host",
 };
 
+const snowColorCode = 0xcff1ff;
+window.snowColorCode = snowColorCode;
+
 const server_url = "https://snowball-gahhahha.herokuapp.com";
 // const server_url = "localhost:8000"
 
@@ -96,7 +99,7 @@ function initGame() {
     75,
     window.innerWidth / window.innerHeight,
     0.1,
-    1000
+    2000
   );
   camera.position.z = 100;
   window.camera = camera;

@@ -13,12 +13,40 @@ export const OpeningAnimation = (enemyName) => {
     cancelAnimationFrame(openingRAFId);
     Game(enemyName);
   });
-  // socket.emit("start");
+  setTimeout(() => {
+    socket.emit("startGameRequest", window.room);
+  }, 3000);
 
   const ballRadius = 10;
   const ballCount = 8;
   const ballLaunchFactor = 3;
   const ballSpeedFactor = 20;
+
+  const generateSkyBox = () => {
+    const Distance = 500;
+
+    const skyBox = new THREE.Mesh(
+      new THREE.PlaneBufferGeometry(Distance * 2, Distance * 2),
+      new THREE.MeshBasicMaterial({ color: 0x60b060 })
+    );
+    [
+      [1, 0, 0],
+      [-1, 0, 0],
+      [0, 1, 0],
+      [0, -1, 0],
+      [0, 0, 1],
+      [0, 0, -1],
+    ].forEach(([x, y, z]) => {
+      const clonedSkyBox = skyBox.clone();
+      clonedSkyBox.position.x = Distance * x;
+      clonedSkyBox.position.y = Distance * y;
+      clonedSkyBox.position.z = Distance * z;
+      clonedSkyBox.rotation.x = y === 0 ? Math.PI / 2 : 0;
+      clonedSkyBox.rotation.y = x === 0 ? Math.PI / 2 : 0;
+      scene.add(clonedSkyBox);
+    });
+  };
+  generateSkyBox();
 
   const ballInitialStats = (() => {
     // {id/initialPosition/speed/direction/createdAt}
@@ -55,7 +83,7 @@ export const OpeningAnimation = (enemyName) => {
   const generateBalls = () => {
     ballInitialStats.forEach((ballStats) => {
       var geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
-      var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      var material = new THREE.MeshBasicMaterial({ color: snowColorCode });
       var sphere = new THREE.Mesh(geometry, material);
       sphere.position.x = ballStats.initialPosition.x;
       sphere.position.y = ballStats.initialPosition.y;
@@ -68,7 +96,7 @@ export const OpeningAnimation = (enemyName) => {
 
   const generateLastBall = () => {
     var geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
-    var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    var material = new THREE.MeshBasicMaterial({ color: snowColorCode });
     var sphere = new THREE.Mesh(geometry, material);
 
     // sphere.position.z = ballStats.initialPosition.z;
