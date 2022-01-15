@@ -67,3 +67,15 @@ async def search_room(socketId: str):
     return data
 
 #  部屋をぶっこわす関数
+async def remove_room(socketId: str):
+    docs = db.collection(ROOM_COLLECTION_KEY).where("socketId_host", "==", socketId).stream()
+    docs2 = db.collection(ROOM_COLLECTION_KEY).where("socketId_guest", "==", socketId).stream()
+    data = []
+    for doc in docs:
+        post = {"uid": doc.id, **doc.to_dict()}
+        data.append(post)
+    for doc in docs2:
+        post = {"uid": doc.id, **doc.to_dict()}
+        data.append(post)
+    result = db.collection(ROOM_COLLECTION_KEY).document(data[0]["socketId"]).delete()
+    return result
