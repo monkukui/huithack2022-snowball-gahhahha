@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-　<meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Document</title>
-  <!-- <link rel="stylesheet" type="text/css" href="./css/style.css"> -->
-  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
-</head>
-<body>
-<script>
-    const socket = io("localhost:8000");
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Document</title>
+    <!-- <link rel="stylesheet" type="text/css" href="./css/style.css"> -->
+    <script
+      src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+      integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <script>
+      const socket = io("localhost:8000");
 
-    socket.on("connect",() => {
+      socket.on("connect", () => {
         console.log(socket.id);
-    });
-</script>    
-</body>
+      });
+    </script>
+  </body>
 </html>
