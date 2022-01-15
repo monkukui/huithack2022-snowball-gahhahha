@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+    integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+    crossorigin="anonymous"></script>
+  <title>Document</title>
+</head>
+
+<body>
+  <button onclick="send('test', JSON.stringify({message:'hello'}))">test</button>
+  <button onclick="send('test2', JSON.stringify({message:'hello2'}))">test2</button>
+  <button onclick="send('echo', JSON.stringify({message:'echom'}))">echo</button>
+  <script>
+    // var socket = io("localhost:8000");
+    const socket = io("localhost:8000", {
+      path: "/ws/socket.io",
+    });
+
+    socket.on("connect", (e) => {
+      console.log("connected!")
+    })
+    const send = (name, body = {}) => {
+      socket.emit(name, body)
+    };
+  </script>
+</body>
+
+</html>
