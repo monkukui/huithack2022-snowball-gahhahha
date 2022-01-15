@@ -2,7 +2,8 @@ import * as THREE from "three";
 
 export const Game = (enemyName) => {
   socket.on("fall", (jsonString) => {
-    const data = JSON.parse(jsonString).data;
+    console.log("fall")
+    const data = jsonString.data;
     const x = data.x;
     const y = data.y;
     syncGenerateSnowball(x, y);
@@ -299,10 +300,15 @@ export const Game = (enemyName) => {
       // TODO: sync position
     }
     count++
-
     renderer.render(scene, camera);
   }
   animate();
+  let snowBallCount = 0; // 何ターン目か。
+  requestFallSnowBall = (timeOut, count) => {
+    socket.emit('requestFall', { room: room, count: count })
+    setTimeout(requestAnimationFrame(), timeOut) // TODO: どんどんはやく
+  }
+  requestFallSnowBall(2000, count++)
 };
 
 window.game = Game;
