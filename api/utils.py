@@ -50,7 +50,7 @@ async def register_room(socketId_host: str, socketId_guest: str):
         "socketId_host": socketId_host,
         "socketId_guest": socketId_guest
     })
-    print(doc_ref.id, "sss")
+    print(doc_ref.id)
     return doc_ref.id
 
 # socketIdで検索してその部屋を探す
