@@ -77,7 +77,7 @@ export const OpeningAnimation = (enemyName) => {
       scene.add(sphere);
     }, 2000);
   };
-  // generateLastBall();
+  generateLastBall();
 
   const tickBalls = () => {
     const balls = scene.children.filter((child) =>

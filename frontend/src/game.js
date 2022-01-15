@@ -51,6 +51,7 @@ export const Game = (enemyName) => {
   const emitPositionTicks = 1;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
+  const snowballMeshQuality = 8;
   const keyInput = {
     up: false,
     down: false,
@@ -188,7 +189,11 @@ export const Game = (enemyName) => {
   };
 
   const tickGenerateSnowBalls = () => {
-    var geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
+    var geometry = new THREE.SphereGeometry(
+      ballRadius,
+      snowballMeshQuality,
+      snowballMeshQuality
+    );
     var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     var sphere = new THREE.Mesh(geometry, material);
     const boundBoxVertical = floorScale - ballRadius * 2;
@@ -277,7 +282,11 @@ export const Game = (enemyName) => {
   };
 
   const syncGenerateSnowball = (x, y) => {
-    var geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
+    var geometry = new THREE.SphereGeometry(
+      ballRadius,
+      snowballMeshQuality,
+      snowballMeshQuality
+    );
     var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     var sphere = new THREE.Mesh(geometry, material);
     sphere.position.x = x;
