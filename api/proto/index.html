@@ -15,14 +15,23 @@
   <button onclick="send('test', JSON.stringify({message:'hello'}))">test</button>
   <button onclick="send('test2', JSON.stringify({message:'hello2'}))">test2</button>
   <button onclick="send('echo', JSON.stringify({message:'echom'}))">echo</button>
+  <input type="text" id="name" placeholder="ここに入れた名前がjoin" />
+  <button
+    onclick="send('join', JSON.stringify({name:document.getElementById('name').value, socketId: socket.id}))">joinたかぴ</button>
+  <div id="status"></div>
   <script>
+    const write = (message) => {
+      const status = document.getElementById("status")
+      status.innerHTML += `<br/><span>${message}</span>`
+    }
     // var socket = io("localhost:8000");
-    const socket = io("localhost:8000", {
+    const socket = io("192.168.137.222:8000", {
       path: "/ws/socket.io",
     });
 
     socket.on("connect", (e) => {
       console.log("connected!")
+      write(`connected.`)
     })
     const send = (name, body = {}) => {
       socket.emit(name, body)

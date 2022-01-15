@@ -1,9 +1,11 @@
-from fastapi import FastAPI
+from socket import socket
+from fastapi import FastAPI, HTTPException, status
 from fastapi_socketio import SocketManager
 # //, emit, join_room, leave_room, close_room, rooms, disconnect
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import random
+from utils import get_entrance, wait_at_entrance, remove_entrance_member, remove_entrance_member_by_uid
 
 app = FastAPI()
 sio = SocketManager(app=app, cors_allowed_origins=[])
@@ -35,7 +37,7 @@ async def echo(sid, *args, **kwargs):
 
 @app.get("/")
 async def root():
-    return "aa"
+    return {"message": "this is root"}
 
 
 @sio.on('test')
@@ -46,9 +48,27 @@ async def test2(sid, *args, **kwargs):
 
 @sio.on('join')
 async def join(sid, *args, **kwargs):
-    pass
     # firestoreに、人がいるか見に行く。
-    # いたら、そいつと部屋マッチングできましたよ。
+    data = json.loads(args[0])
+    if(not (data.get("name") and data.get("socketId"))):
+        print("nono")  # "name, and socketId is required"
+        return
+    entrance = await get_entrance()
+    print("entrance", entrance)
+    if(not len(entrance)):  # だれもいなかったから登録。
+        await wait_at_entrance(data["name"], data["socketId"])
+        print("エントランス登録done")
+    elif len(entrance) >= 2:  # なんか変
+        print('3人以上待ってるね、がっはっは')
+    else:  # マッチング成立！
+        print('ひとり待ってました。')
+        me = {"name": data["name"], "socketId": data["socketId"]}
+        you = entrance[0]
+        await remove_entrance_member_by_uid(you["id"])
+        print(f'マッチング・{me["name"]} vs {you["name"]}')
+        # そのひとりを消して、そいつと、登録されてたあいつでマッチング。
+        # firestore, 部屋に登録。
+    # いたら、そいつと部屋マッチングできましたよ。と登録する。
     # マッチしましたよと。
     # sio.emit("mathed", {
     # enemyName: "a",
@@ -60,13 +80,19 @@ async def join(sid, *args, **kwargs):
     # いなかったら、そいつを部屋にいれて、待ってもらう。
 
 
+@app.sio.on('connect')
+async def connect(socket, *args, **kwargs):
+    print("connected!")
+
+
 @app.sio.on('disconnect')
-def disconnect(reason):
+async def disconnect(reason):
     print(f'disconnected!: {reason}')
+    await remove_entrance_member(reason)
+
     # 壊れたのが待ってる人だったら、firestoreから消す。
     # 壊れたのがプレイ中の人だったら、おわりー！って流す。
     # そして、そのfirestoreも消す。
-
 
 # @sio.on('room')
 # def room(message):
