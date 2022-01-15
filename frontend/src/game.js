@@ -15,8 +15,8 @@ export const Game = (enemyName) => {
     syncAnotherPlayer(x, y);
   });
 
-  socket.on("disconnected", () => {});
-  socket.on("over", () => {});
+  socket.on("disconnected", () => { });
+  socket.on("over", () => { });
 
   const snowBallInitialZ = 150;
 
@@ -259,8 +259,16 @@ export const Game = (enemyName) => {
     sphere.name = "snowball";
   };
 
-  renderer.setSize(window.innerWidth / 1.2, window.innerHeight / 1.2);
-  document.body.appendChild(renderer.domElement);
+  renderer.setSize(window.innerWidth / 1.2, window.innerHeight / 1.2 - 70);
+  // document.body.appendChild(renderer.domElement);
+  document.getElementById("canvasWrapper").appendChild(renderer.domElement);
+
+  // 角はまるく
+  const canvasStyle = document.getElementById("canvasWrapper").firstChild.style
+  canvasStyle.borderRadius = "10px"
+  canvasStyle.margin = "0 auto"
+
+
   function animate() {
     requestAnimationFrame(animate);
 

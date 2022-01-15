@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Document</title>
-    <script src="./main.js"></script>
-  </head>
 
-  <body>
-    hi
-    <button onclick="socket.emit('test', 'sjasdkf')">emit</button>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Document</title>
+  <script src="./main.js"></script>
+  <link rel="stylesheet" href="./materialize.min.css">
+  <script src="./materialize.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet">
+</head>
+
+<body class="blue lighten-5">
+
+  <nav>
+    <div class="nav-wrapper light-blue lighten-2">
+      <a href="#" class="brand-logo" style="font-family: 'Reggae One', cursive; font-weight: bold;">ゆきだまでガッハッハ</a>
+    </div>
+  </nav>
+  hi
+  <button onclick="socket.emit('test', 'sjasdkf')">emit</button>
+  <div id="canvasWrapper" style="border-radius: 10px;text-align: center;"></div>
+</body>
+
 </html>
