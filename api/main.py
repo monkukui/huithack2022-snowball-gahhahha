@@ -67,6 +67,7 @@ async def join(sid, *args, **kwargs):
         await remove_entrance_member_by_uid(you["id"])
         print(f'マッチング・{me["name"]} vs {you["name"]}')
         # そのひとりを消して、そいつと、登録されてたあいつでマッチング。
+        # firestore, 部屋に登録。
     # いたら、そいつと部屋マッチングできましたよ。と登録する。
     # マッチしましたよと。
     # sio.emit("mathed", {
@@ -79,6 +80,11 @@ async def join(sid, *args, **kwargs):
     # いなかったら、そいつを部屋にいれて、待ってもらう。
 
 
+@app.sio.on('connect')
+async def connect(socket, *args, **kwargs):
+    print("connected!")
+
+
 @app.sio.on('disconnect')
 async def disconnect(reason):
     print(f'disconnected!: {reason}')
@@ -87,7 +93,6 @@ async def disconnect(reason):
     # 壊れたのが待ってる人だったら、firestoreから消す。
     # 壊れたのがプレイ中の人だったら、おわりー！って流す。
     # そして、そのfirestoreも消す。
-
 
 # @sio.on('room')
 # def room(message):
