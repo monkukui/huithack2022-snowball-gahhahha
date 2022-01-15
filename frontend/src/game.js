@@ -8,14 +8,14 @@ export const Game = (enemyName) => {
     syncGenerateSnowball(x, y);
   });
 
-  socket.on("enemyPosition", (jsonString) => {
-    const data = JSON.parse(jsonString).data;
-    const x = data.x;
-    const y = data.y;
+  socket.on("enemyPosition", (data) => {
+    const { x, y } = data.data;
+    console.log(`enemy moved to ${x}, ${y}`)
+    // const data = JSON.parse(jsonString).data;
     syncAnotherPlayer(x, y);
   });
 
-  socket.on("disconnected", () => {});
+  socket.on("disconnected", () => { });
   socket.on("over", (data) => {
     console.log(data);
     console.log("over! 負けたか勝ったかどっちかな～");
@@ -274,9 +274,10 @@ export const Game = (enemyName) => {
     sphere.name = "snowball";
   };
 
+  let count = 0
+
   function animate() {
     requestAnimationFrame(animate);
-
     tickMoveByKey();
     tickWallBlock();
     tickSnowBallCollision();
@@ -287,6 +288,17 @@ export const Game = (enemyName) => {
       tickGenerateSnowBalls();
     }
     tickSnowballsAndShadow();
+
+    if (count === 10) {
+      count = 0
+      // console.log("let's sync position!")
+      // for debug
+      const x = Math.random() * 200 - 100
+      const y = Math.random() * 200 - 100
+      socket.emit("position", { room: room, position: { x: x, y: y } })
+      // TODO: sync position
+    }
+    count++
 
     renderer.render(scene, camera);
   }
