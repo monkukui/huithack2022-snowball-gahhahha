@@ -2,16 +2,18 @@ import * as THREE from "three";
 
 export const Game = (enemyName) => {
   socket.on("fall", (jsonString) => {
-    const data = JSON.parse(jsonString).data;
-    const x = data.x;
-    const y = data.y;
-    syncGenerateSnowball(x, y);
+    console.log("fall");
+    const data = jsonString.data;
+    data.forEach((s) => {
+      const { x, y } = s;
+      syncGenerateSnowball(x, y);
+    });
   });
 
-  socket.on("enemyPosition", (jsonString) => {
-    const data = JSON.parse(jsonString).data;
-    const x = data.x;
-    const y = data.y;
+  socket.on("enemyPosition", (data) => {
+    const { x, y } = data.data;
+    // console.log(`enemy moved to ${x}, ${y}`);
+    // const data = JSON.parse(jsonString).data;
     syncAnotherPlayer(x, y);
   });
 
@@ -21,11 +23,10 @@ export const Game = (enemyName) => {
     console.log("over! 負けたか勝ったかどっちかな～");
   });
 
-  // camera.position(new THREE.Vector3(0, -200, 500));
-  camera.position.x = 0;
-camera.position.y = -100;
-camera.position.z = 100;
-  camera.lookAt(new THREE.Vector3(0, 0, 0));
+  camera.position.y = -200;
+  camera.position.z = 200;
+
+  camera.rotation.x = 1;
 
   const snowBallInitialZ = 150;
 
@@ -47,8 +48,10 @@ camera.position.z = 100;
   const playerScale = 30;
   const ballRadius = 14;
   const generateSnowBallTicks = 35;
+  const emitPositionTicks = 3;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
+  const snowballMeshQuality = 8;
   const keyInput = {
     up: false,
     down: false,
@@ -65,7 +68,7 @@ camera.position.z = 100;
     mesh.name = "floor";
     scene.add(mesh);
   };
-  makeFloor();
+  // makeFloor();
 
   const makePlayer = () => {
     const head_ = new THREE.SphereGeometry(
@@ -144,50 +147,20 @@ camera.position.z = 100;
     p1.name = "p1";
     scene.add(p1);
   };
-  makePlayer();
+  makePlayer1();
 
-  const makeAnotherPlayer = () => {
-    //   const head_ = new THREE.SphereGeometry(
-    //   playerScale*0.2,
-    //   32
-    // );
-    // const torso = new THREE.CylinderGeometry(
-    //   playerScale*0.4,
-    //   playerScale*0.4,
-    //   playerScale*0.2,
-    //   32
-    // );
-    // const arm = new THREE.CylinderGeometry(
-    //   playerScale*0.5,
-    //   playerScale*0.5,
-    //   playerScale*0.1,
-    //   32
-    // );
-    // const leg = new THREE.CylinderGeometry(
-    //   playerScale*0.4,
-    //   playerScale*0.3,
-    //   playerScale*0.1,
-    //   32
-    // );
-    
-    // const p2_head = new THREE.Mesh(head_, materialSky);
-    // p2_head.position.x = 50;
-    // p2_head.position.z = playerScale / 2;
-    
-    // const p2_torso = new THREE.Mesh(torso, materialBlue);
-    // p2_torso.position.x = -50;
-    // p2_torso.position.z = playerScale * 3 / 4;
-    // p2_torso.rotation.x = Math.PI / 2;
-    
-    // const p2_arm_l = new THREE.Mesh(arm, materialBlue);
-    // p2_arm_l.position.x = -50;
-    // p2_arm_l.position.z = playerScale * 3 / 4;
-    // p2_arm_l.rotation.x = Math.PI / 2;
-    
-    // const p2_leg_l = new THREE.Mesh(leg, materialBlue);
-    // p2_leg_l.position.x = -50;
-    // p2_leg_l.position.z = playerScale * 3 / 4;
-    // p2_leg_l.rotation.x = Math.PI / 2;
+  const makePlayer2 = () => {
+    const geometry = new THREE.CylinderGeometry(
+      playerRadius,
+      playerRadius,
+      playerHeight,
+      32
+    );
+    const cylinder = new THREE.Mesh(geometry, materialSky);
+    cylinder.name = "cylinder2";
+    cylinder.position.x = 50;
+    cylinder.rotation.x = Math.PI / 2;
+    cylinder.position.z = playerHeight / 2;
 
     // const p2 = new THREE.Group();
     // p2.add(p2_head);
@@ -197,7 +170,19 @@ camera.position.z = 100;
     // p2.name = "p2";
     // scene.add(p2);
   };
-  makeAnotherPlayer();
+  makePlayer2();
+
+  const getSelf = () => {
+    return scene.getObjectByName(
+      playerType === "host" ? "cylinder1" : "cylinder2"
+    );
+  };
+
+  const getEnemy = () => {
+    return scene.getObjectByName(
+      playerType === "guest" ? "cylinder1" : "cylinder2"
+    );
+  };
 
   const setupKeyInput = () => {
     document.onkeydown = function (e) {
@@ -236,7 +221,7 @@ camera.position.z = 100;
   setupKeyInput();
 
   const tickMoveByKey = () => {
-    var p1 = scene.getObjectByName("p1");
+    var self = getSelf();
     const vector2 = {
       x: 0,
       y: 0,
@@ -267,12 +252,16 @@ camera.position.z = 100;
       vector2.y += 1;
     }
     vector2.normalize();
-    p1.position.x += vector2.x * speedFactor;
-    p1.position.y += vector2.y * speedFactor;
+    self.position.x += vector2.x * speedFactor;
+    self.position.y += vector2.y * speedFactor;
   };
 
   const tickGenerateSnowBalls = () => {
-    var geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
+    var geometry = new THREE.SphereGeometry(
+      ballRadius,
+      snowballMeshQuality,
+      snowballMeshQuality
+    );
     var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     var sphere = new THREE.Mesh(geometry, material);
     const boundBoxVertical = floorScale - ballRadius * 2;
@@ -300,6 +289,7 @@ camera.position.z = 100;
         ball.position.z -=
           ((snowBallInitialZ - ball.position.z + 1) / 20) * snowballSpeedFactor;
         if (ball.position.z < 0) {
+          console.log("removed");
           scene.remove(ball);
         }
       };
@@ -320,42 +310,43 @@ camera.position.z = 100;
   };
 
   const tickWallBlock = () => {
-    var player = scene.getObjectByName("p1");
-    if (player.position.x > floorScale / 2 - playerScale) {
-      player.position.x = floorScale / 2 - playerScale;
+    var self = getSelf();
+    if (self.position.x > floorScale / 2 - playerRadius) {
+      self.position.x = floorScale / 2 - playerRadius;
     }
-    if (player.position.x < -floorScale / 2 + playerScale) {
-      player.position.x = -floorScale / 2 + playerScale;
+    if (self.position.x < -floorScale / 2 + playerRadius) {
+      self.position.x = -floorScale / 2 + playerRadius;
     }
-    if (player.position.y > floorScale / 2 - playerScale) {
-      player.position.y = floorScale / 2 - playerScale;
+    if (self.position.y > floorScale / 2 - playerRadius) {
+      self.position.y = floorScale / 2 - playerRadius;
     }
-    if (player.position.y < -floorScale / 2 + playerScale) {
-      player.position.y = -floorScale / 2 + playerScale;
+    if (self.position.y < -floorScale / 2 + playerRadius) {
+      self.position.y = -floorScale / 2 + playerRadius;
     }
   };
 
   const tickSnowBallCollision = () => {
-    var player = scene.getObjectByName("p1");
+    var self = getSelf();
     var balls = scene.children.filter((child) => child.name === "snowball");
     balls.forEach((ball) => {
-      if (
-        ball.position.distanceTo(player.position) <
-        playerScale + ballRadius
-      ) {
+      if (ball.position.distanceTo(self.position) < playerRadius + ballRadius) {
         console.log("hit");
       }
     });
   };
 
   const syncAnotherPlayer = (x, y) => {
-    var cylinder2 = scene.getObjectByName("cylinder2");
-    cylinder2.position.x = x;
-    cylinder2.position.y = y;
+    var enemy = getEnemy();
+    enemy.position.x = x;
+    enemy.position.y = y;
   };
 
   const syncGenerateSnowball = (x, y) => {
-    var geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
+    var geometry = new THREE.SphereGeometry(
+      ballRadius,
+      snowballMeshQuality,
+      snowballMeshQuality
+    );
     var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     var sphere = new THREE.Mesh(geometry, material);
     sphere.position.x = x;
@@ -365,22 +356,53 @@ camera.position.z = 100;
     sphere.name = "snowball";
   };
 
+  let lastX = 0;
+  let lastY = 0;
+  const emitSelfPosition = () => {
+    var self = getSelf();
+    if (self.position.x === lastX && self.position.y === lastY) {
+    } else {
+      lastX = self.position.x;
+      lastY = self.position.y;
+      socket.emit("position", {
+        room: room,
+        position: { x: self.position.x, y: self.position.y },
+      });
+    }
+  };
+
+  let count = 0;
+
   function animate() {
     requestAnimationFrame(animate);
-
     tickMoveByKey();
     tickWallBlock();
     tickSnowBallCollision();
 
     const frameCount = renderer.info.render.frame;
-    if (frameCount % generateSnowBallTicks === 0) {
-      tickGenerateSnowBalls();
-    }
+    // if (frameCount % generateSnowBallTicks === 0) {
+    //   tickGenerateSnowBalls();
+    // }
     tickSnowballsAndShadow();
+
+    if (frameCount % emitPositionTicks === 0) {
+      emitSelfPosition();
+    }
 
     renderer.render(scene, camera);
   }
   animate();
+  let snowBallCount = 0; // 何ターン目か。
+  const requestFallSnowBall = (timeOut, count) => {
+    const before = Date.now();
+    socket.emit("requestFall", { room: room, count: count });
+    console.log(Date.now() - before);
+
+    setTimeout(() => requestFallSnowBall(timeOut, count++), timeOut); // TODO: どんどんはやく
+  };
+  if (playerType === "host") {
+    requestFallSnowBall(500, count++);
+  }
 };
 
 window.game = Game;

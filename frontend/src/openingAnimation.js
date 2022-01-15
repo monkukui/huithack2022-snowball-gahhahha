@@ -5,12 +5,12 @@ const destroyScene = (scene) => {
   while (scene.children.length > 0) {
     scene.remove(scene.children[0]);
   }
-}
+};
 
 export const OpeningAnimation = (enemyName) => {
   socket.on("start", () => {
-    destroyScene(scene)
-    cancelAnimationFrame(openingRAFId)
+    destroyScene(scene);
+    cancelAnimationFrame(openingRAFId);
     Game(enemyName);
   });
   // socket.emit("start");
@@ -47,13 +47,7 @@ export const OpeningAnimation = (enemyName) => {
         createdAt: Date.now(),
       });
     }
-    ret.push({
-      name: "openingCenterSnowball" + Math.random().toString(),
-      initialPosition: new THREE.Vector3(0, 200, -100),
-      speed: 0,
-      direction: new THREE.Vector3(0, -1, 2),
-      createdAt: Date.now(),
-    });
+
     return ret;
   })();
   window.stats = ballInitialStats;
@@ -72,6 +66,19 @@ export const OpeningAnimation = (enemyName) => {
   };
   generateBalls();
 
+  const generateLastBall = () => {
+    var geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
+    var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    var sphere = new THREE.Mesh(geometry, material);
+
+    // sphere.position.z = ballStats.initialPosition.z;
+    sphere.name = "lastSnowball";
+    setTimeout(() => {
+      scene.add(sphere);
+    }, 2000);
+  };
+  generateLastBall();
+
   const tickBalls = () => {
     const balls = scene.children.filter((child) =>
       child.name.includes("openingSnowball")
@@ -89,9 +96,9 @@ export const OpeningAnimation = (enemyName) => {
             .normalize()
             .multiplyScalar(
               ballLaunchFactor *
-              ballStats.speed *
-              deltaSecondsFromCreated *
-              ballSpeedFactor
+                ballStats.speed *
+                deltaSecondsFromCreated *
+                ballSpeedFactor
             )
         )
         .sub(
@@ -114,11 +121,19 @@ export const OpeningAnimation = (enemyName) => {
       }
     });
   };
+
+  const tickLastBall = () => {
+    const lastBall = scene.getObjectByName("lastSnowball");
+    const direction = lastBall.position.sub(camera.position);
+    lastBall.position.z += ballSpeedFactor;
+  };
+
   window.tickBalls = tickBalls;
-  window.openingRAFId = ""
+  window.openingRAFId = "";
   function animate() {
     openingRAFId = requestAnimationFrame(animate);
     tickBalls();
+    // tickLastBall();
     renderer.render(scene, camera);
   }
   animate();
