@@ -45,3 +45,4 @@ async def remove_entrance_member_by_uid(uid: str):
         uid).delete()
     print(f"deleted {uid}.")
     return result
+
