@@ -71,7 +71,7 @@ export const OpeningAnimation = (enemyName) => {
     var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     var sphere = new THREE.Mesh(geometry, material);
 
-    sphere.position.z = ballStats.initialPosition.z;
+    // sphere.position.z = ballStats.initialPosition.z;
     sphere.name = "lastSnowball";
     setTimeout(() => {
       scene.add(sphere);
