@@ -77,7 +77,7 @@ export const OpeningAnimation = (enemyName) => {
       scene.add(sphere);
     }, 2000);
   };
-  generateLastBall();
+  // generateLastBall();
 
   const tickBalls = () => {
     const balls = scene.children.filter((child) =>
@@ -133,7 +133,7 @@ export const OpeningAnimation = (enemyName) => {
   function animate() {
     openingRAFId = requestAnimationFrame(animate);
     tickBalls();
-    tickLastBall();
+    // tickLastBall();
     renderer.render(scene, camera);
   }
   animate();
