@@ -5,7 +5,7 @@ from fastapi_socketio import SocketManager
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import random
-from utils import get_entrance, wait_at_entrance, remove_entrance_member, remove_entrance_member_by_uid
+from utils import get_entrance, register_room, wait_at_entrance, remove_entrance_member, remove_entrance_member_by_uid
 
 app = FastAPI()
 sio = SocketManager(app=app, cors_allowed_origins=[])
@@ -17,6 +17,7 @@ origins = [
     "http://localhost:5500",
     "http://localhost:8080",
     "http://localhost",
+    "http://127.0.0.1:5500"
 ]
 
 app.add_middleware(
@@ -71,6 +72,7 @@ async def join(sid, *args, **kwargs):
             "name": you["name"], "socketId": you["socketId"]}, "guest": {"name": me["name"], "socketId": me["socketId"]}}, to=me["socketId"])
         await sio.emit("matched", {"host": {
             "name": you["name"], "socketId": you["socketId"]}, "guest": {"name": me["name"], "socketId": me["socketId"]}}, to=you["socketId"])
+        await register_room(you["socketId"], me["socketId"])
         # そのひとりを消して、そいつと、登録されてたあいつでマッチング。
         # firestore, 部屋に登録。
     # いたら、そいつと部屋マッチングできましたよ。と登録する。
