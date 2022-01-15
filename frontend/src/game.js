@@ -21,6 +21,9 @@ export const Game = (enemyName) => {
     console.log("over! 負けたか勝ったかどっちかな～");
   });
 
+  camera.position = new THREE.Vector3(0, -200, 500);
+  camera.rotation.x = 1;
+
   const snowBallInitialZ = 150;
 
   const materialBlue = new THREE.MeshBasicMaterial({
@@ -245,6 +248,15 @@ export const Game = (enemyName) => {
     });
   };
 
+  const tickDeleteSnowBall = () => {
+    var balls = scene.children.filter((child) => child.name === "snowball");
+    balls.forEach((ball) => {
+      if (ball.position.z < -10) {
+        scene.remove(ball);
+      }
+    });
+  };
+
   const syncAnotherPlayer = (x, y) => {
     var cylinder2 = scene.getObjectByName("cylinder2");
     cylinder2.position.x = x;
@@ -268,6 +280,7 @@ export const Game = (enemyName) => {
     tickMoveByKey();
     tickWallBlock();
     tickSnowBallCollision();
+    tickDeleteSnowball();
 
     const frameCount = renderer.info.render.frame;
     if (frameCount % generateSnowBallTicks === 0) {

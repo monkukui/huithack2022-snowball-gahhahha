@@ -38,14 +38,18 @@ export const OpeningAnimation = (enemyName) => {
         createdAt: Date.now(),
       });
     }
-    ret.push({
-      name: "openingCenterSnowball" + Math.random().toString(),
-      initialPosition: new THREE.Vector3(0, 200, -100),
-      speed: 0,
-      direction: new THREE.Vector3(0, -1, 2),
-      createdAt: Date.now(),
-    });
-    return ret;
+    setTimeout(() => {
+      ret.push({
+        name: "openingSnowballCenter" + Math.random().toString(),
+        initialPosition: new THREE.Vector3(0, 0, -30),
+        speed: 10,
+        // direction: new THREE.Vector3(0, -1, 2),
+        direction: new THREE.Vector3(0, -1, 10).normalize(),
+        createdAt: Date.now(),
+      });
+
+      return ret;
+    }, 2000);
   })();
   window.stats = ballInitialStats;
 
@@ -62,6 +66,19 @@ export const OpeningAnimation = (enemyName) => {
     });
   };
   generateBalls();
+
+  const generateLastBall = () => {
+    var geometry = new THREE.SphereGeometry(ballRadius, 32, 32);
+    var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    var sphere = new THREE.Mesh(geometry, material);
+
+    sphere.position.z = ballStats.initialPosition.z;
+    sphere.name = "lastSnowball";
+    setTimeout(() => {
+      scene.add(sphere);
+    }, 2000);
+  };
+  generateLastBall();
 
   const tickBalls = () => {
     const balls = scene.children.filter((child) =>
@@ -105,10 +122,18 @@ export const OpeningAnimation = (enemyName) => {
       }
     });
   };
+
+  const tickLastBall = () => {
+    const lastBall = scene.getObjectByName("lastSnowball");
+    const direction = lastBall.position.sub(camera.position);
+    lastBall.position.z += ballSpeedFactor;
+  };
+
   window.tickBalls = tickBalls;
   function animate() {
     requestAnimationFrame(animate);
     tickBalls();
+    tickLastBall();
     renderer.render(scene, camera);
   }
   animate();
