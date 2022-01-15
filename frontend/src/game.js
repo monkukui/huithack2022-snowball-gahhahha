@@ -4,14 +4,15 @@ export const Game = (enemyName) => {
   socket.on("fall", (jsonString) => {
     console.log("fall");
     const data = jsonString.data;
-    const x = data.x;
-    const y = data.y;
-    syncGenerateSnowball(x, y);
+    data.forEach((s) => {
+      const { x, y } = s;
+      syncGenerateSnowball(x, y);
+    });
   });
 
   socket.on("enemyPosition", (data) => {
     const { x, y } = data.data;
-    console.log(`enemy moved to ${x}, ${y}`);
+    // console.log(`enemy moved to ${x}, ${y}`);
     // const data = JSON.parse(jsonString).data;
     syncAnotherPlayer(x, y);
   });
@@ -77,7 +78,6 @@ export const Game = (enemyName) => {
       playerHeight,
       32
     );
-
     const cylinder = new THREE.Mesh(geometry, materialBlue);
     cylinder.name = "cylinder1";
     cylinder.position.x = -50;
@@ -315,9 +315,9 @@ export const Game = (enemyName) => {
     tickDeleteSnowball();
 
     const frameCount = renderer.info.render.frame;
-    if (frameCount % generateSnowBallTicks === 0) {
-      tickGenerateSnowBalls();
-    }
+    // if (frameCount % generateSnowBallTicks === 0) {
+    //   tickGenerateSnowBalls();
+    // }
     tickSnowballsAndShadow();
 
     if (frameCount % emitPositionTicks === 0) {
@@ -329,11 +329,13 @@ export const Game = (enemyName) => {
   }
   animate();
   let snowBallCount = 0; // 何ターン目か。
-  requestFallSnowBall = (timeOut, count) => {
+  const requestFallSnowBall = (timeOut, count) => {
     socket.emit("requestFall", { room: room, count: count });
-    setTimeout(requestAnimationFrame(), timeOut); // TODO: どんどんはやく
+    setTimeout(() => requestFallSnowBall(timeOut, count++), timeOut); // TODO: どんどんはやく
   };
-  requestFallSnowBall(2000, count++);
+  if (playerType === "host") {
+    requestFallSnowBall(1500, count++);
+  }
 };
 
 window.game = Game;

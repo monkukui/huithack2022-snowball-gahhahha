@@ -117,14 +117,15 @@ async def syncPos(socket, req):
     to = req["room"][opponentType[playerType]]["socketId"]
     await sio.emit("enemyPosition", {"data": req["position"]}, to=to)
 
+c = 6
+
 
 def generate_snowballs_from_count(count):
-    c = 4
     res = []
     for i in range(c):
-        res.push({
-            "x": int(random.random() * 200 - 100),
-            "y": int(random.random() * 200 - 100)
+        res.append({
+            "x": int(random.random() * (200 - 30) - 85),
+            "y": int(random.random() * (200 - 30) - 85)
         })
     return res
 
