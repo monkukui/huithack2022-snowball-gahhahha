@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Over } from "./over";
 
 export const Game = (enemyName) => {
   socket.on("fall", (jsonString) => {
@@ -20,6 +21,7 @@ export const Game = (enemyName) => {
   socket.on("over", (data) => {
     console.log(data);
     console.log("over! 負けたか勝ったかどっちかな～");
+    Over();
   });
 
   camera.position.y = -200;
@@ -378,7 +380,8 @@ export const Game = (enemyName) => {
         ball.position.distanceTo(self.position) <
         playerScale / 3 + ballRadius
       ) {
-        console.log("hit");
+        cancelAnimationFrame(gameRAFId);
+        Over();
       }
     });
   };
@@ -421,8 +424,9 @@ export const Game = (enemyName) => {
 
   let count = 0;
 
+  window.gameRAFId = "";
   function animate() {
-    requestAnimationFrame(animate);
+    gameRAFId = requestAnimationFrame(animate);
     tickMoveByKey();
     tickWallBlock();
     tickSnowBallCollision();
