@@ -20,7 +20,20 @@ const goToEntrance = () => {
 
 window.goToEntrance = goToEntrance
 
+/**
+ * 
+ * @param {*} name // one of "host" or "guest"
+ * // enum とかで管理するときれいかもしれない
+ */
+window.playerType = undefined
 
+window.room = {}
+
+// 相手のタイプ取得したいときに使う
+const opponentType = {
+  host: "guest",
+  guest: "host"
+}
 
 function startSocket(name) {
   console.log("startSocket")
@@ -37,16 +50,28 @@ function startSocket(name) {
 
   socket.on("connect", () => {
     console.log(socket.id);
+    // TODO: join
+    socket.emit("join", JSON.stringify({
+      name: "あああ",
+      socketId: socket.id
+    }))
   });
 
-  socket.on("matched", (jsonString) => {
+  socket.on("matched", (room) => {
     _id("home").style.display = "none"
     initGame()
-    const enemyName = JSON.parse(jsonString).enemyName;
-    OpeningAnimation(enemyName);
+    window.room = room
+    // const enemyName = JSON.parse(jsonString).enemyName;
+    if (room.host.socketId === socket.id) {
+      playerType = "host"
+    } else {
+      playerType = "guest"
+    }
+    // マッチングしました！のアニメーション、終わってちょっと待ってから startGameRequest(window.room) を emit する。
+    OpeningAnimation(room[opponentType[playerType]].name); // you
+    // 相手のやつ出したかったら
+    // opponentType[playerType] です
   });
-  // ここまで待つ。
-
   // TODO: エラーハンドリング
 }
 
@@ -76,7 +101,7 @@ function initGame() {
   renderer.setSize(window.innerWidth / 1.2, window.innerHeight / 1.2 - 70);
   // document.body.appendChild(renderer.domElement);
   document.getElementById("canvasWrapper").appendChild(renderer.domElement);
-  OpeningAnimation("Bob");
+  // OpeningAnimation("Bob");
 
   // 角はまるく
   const canvasStyle = document.getElementById("canvasWrapper").firstChild.style

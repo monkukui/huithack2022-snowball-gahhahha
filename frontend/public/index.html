@@ -21,10 +21,10 @@
       <a href="#" class="brand-logo" style="font-family: 'Reggae One', cursive; font-weight: bold;">ゆきだまでガッハッハ</a>
     </div>
   </nav>
-  hi
   <button onclick="socket.emit('test', 'sjasdkf')">emit</button>
   <button onclick="startDangerously()">むりやり対戦相手みつける</button>
   <button onclick="game()">からのむりやりゲームをはじめる</button>
+  <button onclick="socket.emit('startGameRequest', window.room)">startGameRequest()</button>
   <div id="canvasWrapper" style="border-radius: 10px;text-align: center;"></div>
   <!-- 最初の画面 ゲーム始まったら消す -->
   <div id="home" class="container">

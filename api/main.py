@@ -65,7 +65,12 @@ async def join(sid, *args, **kwargs):
         me = {"name": data["name"], "socketId": data["socketId"]}
         you = entrance[0]
         await remove_entrance_member_by_uid(you["id"])
+        # あとから来たのがmeで、meがguest.さきにいたyouがhost.
         print(f'マッチング・{me["name"]} vs {you["name"]}')
+        await sio.emit("matched", {"host": {
+            "name": you["name"], "socketId": you["socketId"]}, "guest": {"name": me["name"], "socketId": me["socketId"]}}, to=me["socketId"])
+        await sio.emit("matched", {"host": {
+            "name": you["name"], "socketId": you["socketId"]}, "guest": {"name": me["name"], "socketId": me["socketId"]}}, to=you["socketId"])
         # そのひとりを消して、そいつと、登録されてたあいつでマッチング。
         # firestore, 部屋に登録。
     # いたら、そいつと部屋マッチングできましたよ。と登録する。
@@ -78,6 +83,14 @@ async def join(sid, *args, **kwargs):
     # sio.emit("start", ...)
 
     # いなかったら、そいつを部屋にいれて、待ってもらう。
+
+
+@app.sio.on('startGameRequest')
+async def gameRequested(socket, req):
+    print(socket, req)
+    # {'host': {'name': 'あああ', 'socketId': 'F9GWXPwIg99fFogDAAAB'}, 'guest': {'name': 'あああ', 'socketId': 'am0i2xgq1Tyb8RctAAAD'}}
+    await sio.emit('start', to=req["host"]["socketId"])
+    await sio.emit('start', to=req["guest"]["socketId"])
 
 
 @app.sio.on('connect')
