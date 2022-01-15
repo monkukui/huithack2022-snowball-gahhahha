@@ -69,7 +69,7 @@ export const Game = (enemyName) => {
     mesh.name = "floor";
     scene.add(mesh);
   };
-  makeFloor();
+  // makeFloor();
 
   const makePlayer1 = () => {
     const geometry = new THREE.CylinderGeometry(
@@ -221,6 +221,7 @@ export const Game = (enemyName) => {
         ball.position.z -=
           ((snowBallInitialZ - ball.position.z + 1) / 20) * snowballSpeedFactor;
         if (ball.position.z < 0) {
+          console.log("removed");
           scene.remove(ball);
         }
       };
@@ -262,15 +263,6 @@ export const Game = (enemyName) => {
     balls.forEach((ball) => {
       if (ball.position.distanceTo(self.position) < playerRadius + ballRadius) {
         console.log("hit");
-      }
-    });
-  };
-
-  const tickDeleteSnowball = () => {
-    var balls = scene.children.filter((child) => child.name === "snowball");
-    balls.forEach((ball) => {
-      if (ball.position.z < -10) {
-        scene.remove(ball);
       }
     });
   };
@@ -318,7 +310,6 @@ export const Game = (enemyName) => {
     tickMoveByKey();
     tickWallBlock();
     tickSnowBallCollision();
-    tickDeleteSnowball();
 
     const frameCount = renderer.info.render.frame;
     // if (frameCount % generateSnowBallTicks === 0) {
@@ -335,11 +326,14 @@ export const Game = (enemyName) => {
   animate();
   let snowBallCount = 0; // 何ターン目か。
   const requestFallSnowBall = (timeOut, count) => {
+    const before = Date.now();
     socket.emit("requestFall", { room: room, count: count });
+    console.log(Date.now() - before);
+
     setTimeout(() => requestFallSnowBall(timeOut, count++), timeOut); // TODO: どんどんはやく
   };
   if (playerType === "host") {
-    requestFallSnowBall(1500, count++);
+    requestFallSnowBall(500, count++);
   }
 };
 
