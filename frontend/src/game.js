@@ -16,7 +16,10 @@ export const Game = (enemyName) => {
   });
 
   socket.on("disconnected", () => {});
-  socket.on("over", () => {});
+  socket.on("over", (data) => {
+    console.log(data);
+    console.log("over! 負けたか勝ったかどっちかな～");
+  });
 
   const snowBallInitialZ = 150;
 
@@ -276,3 +279,5 @@ export const Game = (enemyName) => {
   }
   animate();
 };
+
+window.game = Game;

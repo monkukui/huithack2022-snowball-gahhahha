@@ -1,26 +1,90 @@
 import { io } from "socket.io-client";
 import * as THREE from "three";
 import { OpeningAnimation } from "./openingAnimation";
-const socket = io("localhost:8000", {
-  path: "/ws/socket.io",
-});
-window.socket = socket;
 
-socket.emit("join", JSON.stringify({ name: "Alice" }));
-socket.emit("echo", JSON.stringify({ name: "Alice" }));
-socket.on("echo", (jsonString) => {
-  console.log(JSON.parse(jsonString));
-});
-socket.on("connect", () => {
-  console.log(socket.id);
-});
+const _id = (id) => {
+  return document.getElementById(id);
+};
 
-socket.on("matched", (jsonString) => {
-  const enemyName = JSON.parse(jsonString).enemyName;
-  OpeningAnimation(enemyName);
-});
+const goToEntrance = () => {
+  console.log("goToEntrance");
+  const beginButton = _id("begin-button");
+  const name = _id("name-input").value;
+  console.log(`${name} はじめるよ！`);
+  beginButton.disabled = true;
+  startSocket(name);
+  _id("entrance_status").innerHTML = "waiting for おまえの対戦相手…";
+};
 
-window.onload = function () {
+window.goToEntrance = goToEntrance;
+
+/**
+ *
+ * @param {*} name // one of "host" or "guest"
+ * // enum とかで管理するときれいかもしれない
+ */
+window.playerType = undefined;
+
+window.room = {};
+
+// 相手のタイプ取得したいときに使う
+const opponentType = {
+  host: "guest",
+  guest: "host",
+};
+
+function startSocket(name) {
+  console.log("startSocket");
+  const socket = io("localhost:8000", {
+    path: "/ws/socket.io",
+  });
+  window.socket = socket;
+
+  socket.emit("join", JSON.stringify({ name: name }));
+  socket.emit("echo", JSON.stringify({ name: name }));
+  socket.on("echo", (jsonString) => {
+    console.log(JSON.parse(jsonString), "echoed :)");
+  });
+
+  socket.on("connect", () => {
+    console.log(socket.id);
+    // TODO: join
+    socket.emit(
+      "join",
+      JSON.stringify({
+        name: "あああ",
+        socketId: socket.id,
+      })
+    );
+  });
+
+  socket.on("matched", (room) => {
+    _id("home").style.display = "none";
+    initGame();
+    window.room = room;
+    // const enemyName = JSON.parse(jsonString).enemyName;
+    if (room.host.socketId === socket.id) {
+      playerType = "host";
+    } else {
+      playerType = "guest";
+    }
+    // マッチングしました！のアニメーション、終わってちょっと待ってから startGameRequest(window.room) を emit する。
+    OpeningAnimation(room[opponentType[playerType]].name); // you
+    // 相手のやつ出したかったら
+    // opponentType[playerType] です
+  });
+  // TODO: エラーハンドリング
+}
+
+window.startDangerously = () => {
+  _id("home").style.display = "none";
+  startSocket();
+  initGame();
+};
+
+// window.onload =
+function initGame() {
+  console.log("initGame");
   const renderer = new THREE.WebGLRenderer();
   window.renderer = renderer;
   const scene = new THREE.Scene();
@@ -36,10 +100,10 @@ window.onload = function () {
   renderer.setSize(window.innerWidth / 1.2, window.innerHeight / 1.2 - 70);
   // document.body.appendChild(renderer.domElement);
   document.getElementById("canvasWrapper").appendChild(renderer.domElement);
-  OpeningAnimation("Bob");
+  // OpeningAnimation("Bob");
 
   // 角はまるく
   const canvasStyle = document.getElementById("canvasWrapper").firstChild.style;
   canvasStyle.borderRadius = "10px";
   canvasStyle.margin = "0 auto";
-};
+}

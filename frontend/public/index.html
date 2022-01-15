@@ -21,9 +21,43 @@
       <a href="#" class="brand-logo" style="font-family: 'Reggae One', cursive; font-weight: bold;">ゆきだまでガッハッハ</a>
     </div>
   </nav>
-  hi
   <button onclick="socket.emit('test', 'sjasdkf')">emit</button>
+  <button onclick="startDangerously()">むりやり対戦相手みつける</button>
+  <button onclick="game()">からのむりやりゲームをはじめる</button>
+  <button onclick="socket.emit('startGameRequest', window.room)">startGameRequest()</button>
   <div id="canvasWrapper" style="border-radius: 10px;text-align: center;"></div>
+  <!-- 最初の画面 ゲーム始まったら消す -->
+  <div id="home" class="container">
+    <div class="">
+      <h5 style="text-align: center;">なまえを入力してあそぼう！</h5>
+      <div class="row">
+        <div class="col s3"></div>
+        <div class="col s6" style="text-align:center">
+          <!-- なまえ入力 -->
+          <input type="text" class="input-field" oninput="checkInput(this)" id="name-input">
+        </div>
+        <div class="col s3"></div>
+      </div>
+      <div style="text-align: center;">
+        <button class="btn indigo" id="begin-button" onclick="goToEntrance()" disabled>
+          始める！
+        </button>
+      </div>
+    </div>
+    <div id="entrance_status"></div>
+  </div>
+
+  <script>
+    function checkInput(e) {
+      const button = document.getElementById("begin-button")
+      const val = e.value
+      if (val) {
+        button.disabled = false
+      } else {
+        button.disabled = true
+      }
+    }
+  </script>
 </body>
 
 </html>

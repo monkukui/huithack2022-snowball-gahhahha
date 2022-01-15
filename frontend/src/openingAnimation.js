@@ -4,7 +4,7 @@ export const OpeningAnimation = (enemyName) => {
   socket.on("start", () => {
     Game(enemyName);
   });
-  socket.emit("start");
+  // socket.emit("start");
 
   const ballRadius = 10;
   const ballCount = 8;
