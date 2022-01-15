@@ -40,7 +40,7 @@ function startSocket(name) {
   });
   window.socket = socket;
 
-  socket.emit("join", JSON.stringify({ name: name }));
+  // socket.emit("join", JSON.stringify({ name: name }));
   socket.emit("echo", JSON.stringify({ name: name }));
   socket.on("echo", (jsonString) => {
     console.log(JSON.parse(jsonString), "echoed :)");
@@ -52,7 +52,7 @@ function startSocket(name) {
     socket.emit(
       "join",
       JSON.stringify({
-        name: "あああ",
+        name: name,
         socketId: socket.id,
       })
     );

@@ -49,7 +49,7 @@ export const Game = (enemyName) => {
   const playerHeight = 20;
   const ballRadius = 14;
   const generateSnowBallTicks = 35;
-  const emitPositionTicks = 1;
+  const emitPositionTicks = 3;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
   const snowballMeshQuality = 8;
@@ -296,13 +296,19 @@ export const Game = (enemyName) => {
     sphere.name = "snowball";
   };
 
-  const emitSelfPosition = (x, y) => {
+  let lastX = 0;
+  let lastY = 0;
+  const emitSelfPosition = () => {
     var self = getSelf();
-
-    socket.emit("position", {
-      room: room,
-      position: { x: self.position.x, y: self.position.y },
-    });
+    if (self.position.x === lastX && self.position.y === lastY) {
+    } else {
+      lastX = self.position.x;
+      lastY = self.position.y;
+      socket.emit("position", {
+        room: room,
+        position: { x: self.position.x, y: self.position.y },
+      });
+    }
   };
 
   let count = 0;
@@ -323,7 +329,6 @@ export const Game = (enemyName) => {
     if (frameCount % emitPositionTicks === 0) {
       emitSelfPosition();
     }
-    count++;
 
     renderer.render(scene, camera);
   }
