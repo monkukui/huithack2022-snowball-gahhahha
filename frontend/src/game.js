@@ -24,7 +24,7 @@ export const Game = (enemyName) => {
   });
 
   camera.position.y = -200;
-  camera.position.z = 200;
+  camera.position.z = 100;
 
   camera.rotation.x = 1;
 
@@ -68,120 +68,162 @@ export const Game = (enemyName) => {
     mesh.name = "floor";
     scene.add(mesh);
   };
-  // makeFloor();
+  makeFloor();
 
-  const makePlayer = () => {
-    const head_ = new THREE.SphereGeometry(
-      playerScale*0.1,
+  const makePlayer1 = () => {
+    const headGeometry = new THREE.SphereGeometry(playerScale * 0.1, 32);
+    const neckGeometry = new THREE.CylinderGeometry(
+      playerScale * 0.1,
+      playerScale * 0.1,
+      playerScale * 0.1,
       32
     );
-    const neck = new THREE.CylinderGeometry(
-      playerScale*0.1,
-      playerScale*0.1,
-      playerScale*0.1,
+    const torsoGeometry = new THREE.BoxGeometry(
+      playerScale * 0.2,
+      playerScale * 0.4,
+      playerScale * 0.2
+    );
+    const armGeometry = new THREE.CylinderGeometry(
+      playerScale * 0.05,
+      playerScale * 0.05,
+      playerScale * 0.35,
       32
     );
-    const torso = new THREE.BoxGeometry(
-      playerScale*0.2,
-      playerScale*0.4,
-      playerScale*0.2
-    );
-    const arm = new THREE.CylinderGeometry(
-      playerScale*0.05,
-      playerScale*0.05,
-      playerScale*0.35,
+    const legGeometry = new THREE.CylinderGeometry(
+      playerScale * 0.05,
+      playerScale * 0.05,
+      playerScale * 0.4,
       32
     );
-    const leg = new THREE.CylinderGeometry(
-      playerScale*0.05,
-      playerScale*0.05,
-      playerScale*0.4,
-      32
-    );
-    
-    const p1_head = new THREE.Mesh(head_, materialSky);
-    p1_head.position.x = -50;
-    p1_head.position.z = playerScale * 0.9;
-    
-    const p1_neck = new THREE.Mesh(neck, materialBlue);
-    p1_neck.position.x = -50;
-    p1_neck.position.z = playerScale * 0.8;
-    p1_neck.rotation.x = Math.PI / 2;
-    
-    const p1_torso = new THREE.Mesh(torso, materialBlue);
-    p1_torso.position.x = -50;
-    p1_torso.position.z = playerScale * 0.6;
-    p1_torso.rotation.x = Math.PI / 2;
-    
-    const p1_arm_l = new THREE.Mesh(arm, materialBlue);
-    p1_arm_l.position.x = -50 - playerScale * 0.15;
-    p1_arm_l.position.z = playerScale * 0.6;
-    p1_arm_l.rotation.x = Math.PI / 2;
-    p1_arm_l.rotation.z = Math.PI * (-0.1);
-    
-    const p1_arm_r = new THREE.Mesh(arm, materialBlue);
-    p1_arm_r.position.x = -50 + playerScale * 0.15;
-    p1_arm_r.position.z = playerScale * 0.6;
-    p1_arm_r.rotation.x = Math.PI / 2;
-    p1_arm_r.rotation.z = Math.PI * 0.1;
-    
-    const p1_leg_l = new THREE.Mesh(leg, materialBlue);
-    p1_leg_l.position.x = -50 - playerScale * 0.07;
-    p1_leg_l.position.z = playerScale * 0.2;
-    p1_leg_l.rotation.x = Math.PI / 2;
-    p1_leg_l.rotation.z = Math.PI * (-0.05);
-    
-    const p1_leg_r = new THREE.Mesh(leg, materialBlue);
-    p1_leg_r.position.x = -50 + playerScale * 0.07;
-    p1_leg_r.position.z = playerScale * 0.2;
-    p1_leg_r.rotation.x = Math.PI / 2;
-    p1_leg_r.rotation.z = Math.PI * 0.05;
+
+    const head = new THREE.Mesh(headGeometry, materialSky);
+    head.position.z = playerScale * 0.9;
+
+    const neck = new THREE.Mesh(neckGeometry, materialBlue);
+    neck.position.z = playerScale * 0.8;
+    neck.rotation.x = Math.PI / 2;
+
+    const torso = new THREE.Mesh(torsoGeometry, materialBlue);
+    torso.position.z = playerScale * 0.6;
+    torso.rotation.x = Math.PI / 2;
+
+    const arm_l = new THREE.Mesh(armGeometry, materialBlue);
+    arm_l.position.x = -playerScale * 0.15;
+    arm_l.position.z = playerScale * 0.6;
+    arm_l.rotation.x = Math.PI / 2;
+    arm_l.rotation.z = Math.PI * -0.1;
+
+    const arm_r = new THREE.Mesh(armGeometry, materialBlue);
+    arm_r.position.x = playerScale * 0.15;
+    arm_r.position.z = playerScale * 0.6;
+    arm_r.rotation.x = Math.PI / 2;
+    arm_r.rotation.z = Math.PI * 0.1;
+
+    const leg_l = new THREE.Mesh(legGeometry, materialBlue);
+    leg_l.position.x = -playerScale * 0.07;
+    leg_l.position.z = playerScale * 0.2;
+    leg_l.rotation.x = Math.PI / 2;
+    leg_l.rotation.z = Math.PI * -0.05;
+
+    const leg_r = new THREE.Mesh(legGeometry, materialBlue);
+    leg_r.position.x = playerScale * 0.07;
+    leg_r.position.z = playerScale * 0.2;
+    leg_r.rotation.x = Math.PI / 2;
+    leg_r.rotation.z = Math.PI * 0.05;
 
     const p1 = new THREE.Group();
-    p1.add(p1_head);
-    p1.add(p1_torso);
-    p1.add(p1_arm_l);
-    p1.add(p1_arm_r);
-    p1.add(p1_leg_l);
-    p1.add(p1_leg_r);
+    p1.add(head);
+    p1.add(neck);
+    p1.add(torso);
+    p1.add(arm_l);
+    p1.add(arm_r);
+    p1.add(leg_l);
+    p1.add(leg_r);
     p1.name = "p1";
     scene.add(p1);
   };
   makePlayer1();
 
   const makePlayer2 = () => {
-    const geometry = new THREE.CylinderGeometry(
-      playerRadius,
-      playerRadius,
-      playerHeight,
+    const headGeometry = new THREE.SphereGeometry(playerScale * 0.1, 32);
+    const neckGeometry = new THREE.CylinderGeometry(
+      playerScale * 0.1,
+      playerScale * 0.1,
+      playerScale * 0.1,
       32
     );
-    const cylinder = new THREE.Mesh(geometry, materialSky);
-    cylinder.name = "cylinder2";
-    cylinder.position.x = 50;
-    cylinder.rotation.x = Math.PI / 2;
-    cylinder.position.z = playerHeight / 2;
+    const torsoGeometry = new THREE.BoxGeometry(
+      playerScale * 0.2,
+      playerScale * 0.4,
+      playerScale * 0.2
+    );
+    const armGeometry = new THREE.CylinderGeometry(
+      playerScale * 0.05,
+      playerScale * 0.05,
+      playerScale * 0.35,
+      32
+    );
+    const legGeometry = new THREE.CylinderGeometry(
+      playerScale * 0.05,
+      playerScale * 0.05,
+      playerScale * 0.4,
+      32
+    );
 
-    // const p2 = new THREE.Group();
-    // p2.add(p2_head);
-    // p2.add(p2_torso);
-    // p2.add(p2_arm_l);
-    // p2.add(p2_leg_l);
-    // p2.name = "p2";
-    // scene.add(p2);
+    const head = new THREE.Mesh(headGeometry, materialSky);
+    head.position.z = playerScale * 0.9;
+
+    const neck = new THREE.Mesh(neckGeometry, materialBlue);
+    neck.position.z = playerScale * 0.8;
+    neck.rotation.x = Math.PI / 2;
+
+    const torso = new THREE.Mesh(torsoGeometry, materialBlue);
+    torso.position.z = playerScale * 0.6;
+    torso.rotation.x = Math.PI / 2;
+
+    const arm_l = new THREE.Mesh(armGeometry, materialBlue);
+    arm_l.position.x = -playerScale * 0.15;
+    arm_l.position.z = playerScale * 0.6;
+    arm_l.rotation.x = Math.PI / 2;
+    arm_l.rotation.z = Math.PI * -0.1;
+
+    const arm_r = new THREE.Mesh(armGeometry, materialBlue);
+    arm_r.position.x = playerScale * 0.15;
+    arm_r.position.z = playerScale * 0.6;
+    arm_r.rotation.x = Math.PI / 2;
+    arm_r.rotation.z = Math.PI * 0.1;
+
+    const leg_l = new THREE.Mesh(legGeometry, materialBlue);
+    leg_l.position.x = -playerScale * 0.07;
+    leg_l.position.z = playerScale * 0.2;
+    leg_l.rotation.x = Math.PI / 2;
+    leg_l.rotation.z = Math.PI * -0.05;
+
+    const leg_r = new THREE.Mesh(legGeometry, materialBlue);
+    leg_r.position.x = playerScale * 0.07;
+    leg_r.position.z = playerScale * 0.2;
+    leg_r.rotation.x = Math.PI / 2;
+    leg_r.rotation.z = Math.PI * 0.05;
+
+    const group = new THREE.Group();
+    group.add(head);
+    group.add(neck);
+    group.add(torso);
+    group.add(arm_l);
+    group.add(arm_r);
+    group.add(leg_l);
+    group.add(leg_r);
+    group.name = "p2";
+    scene.add(group);
   };
   makePlayer2();
 
   const getSelf = () => {
-    return scene.getObjectByName(
-      playerType === "host" ? "cylinder1" : "cylinder2"
-    );
+    return scene.getObjectByName(playerType === "host" ? "p1" : "p2");
   };
 
   const getEnemy = () => {
-    return scene.getObjectByName(
-      playerType === "guest" ? "cylinder1" : "cylinder2"
-    );
+    return scene.getObjectByName(playerType === "guest" ? "p2" : "p1");
   };
 
   const setupKeyInput = () => {
@@ -311,17 +353,17 @@ export const Game = (enemyName) => {
 
   const tickWallBlock = () => {
     var self = getSelf();
-    if (self.position.x > floorScale / 2 - playerRadius) {
-      self.position.x = floorScale / 2 - playerRadius;
+    if (self.position.x > floorScale / 2 - playerScale / 3) {
+      self.position.x = floorScale / 2 - playerScale / 3;
     }
-    if (self.position.x < -floorScale / 2 + playerRadius) {
-      self.position.x = -floorScale / 2 + playerRadius;
+    if (self.position.x < -floorScale / 2 + playerScale / 3) {
+      self.position.x = -floorScale / 2 + playerScale / 3;
     }
-    if (self.position.y > floorScale / 2 - playerRadius) {
-      self.position.y = floorScale / 2 - playerRadius;
+    if (self.position.y > floorScale / 2 - playerScale / 3) {
+      self.position.y = floorScale / 2 - playerScale / 3;
     }
-    if (self.position.y < -floorScale / 2 + playerRadius) {
-      self.position.y = -floorScale / 2 + playerRadius;
+    if (self.position.y < -floorScale / 2 + playerScale / 3) {
+      self.position.y = -floorScale / 2 + playerScale / 3;
     }
   };
 
@@ -329,7 +371,10 @@ export const Game = (enemyName) => {
     var self = getSelf();
     var balls = scene.children.filter((child) => child.name === "snowball");
     balls.forEach((ball) => {
-      if (ball.position.distanceTo(self.position) < playerRadius + ballRadius) {
+      if (
+        ball.position.distanceTo(self.position) <
+        playerScale / 3 + ballRadius
+      ) {
         console.log("hit");
       }
     });
@@ -401,7 +446,7 @@ export const Game = (enemyName) => {
     setTimeout(() => requestFallSnowBall(timeOut, count++), timeOut); // TODO: どんどんはやく
   };
   if (playerType === "host") {
-    requestFallSnowBall(500, count++);
+    requestFallSnowBall(1500, count++);
   }
 };
 
