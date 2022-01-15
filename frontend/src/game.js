@@ -286,3 +286,5 @@ export const Game = (enemyName) => {
   }
   animate();
 };
+
+window.game = Game

@@ -1,26 +1,64 @@
 import { io } from "socket.io-client";
 import * as THREE from "three";
 import { OpeningAnimation } from "./openingAnimation";
-const socket = io("localhost:8000", {
-  path: "/ws/socket.io",
-});
-window.socket = socket;
 
-socket.emit("join", JSON.stringify({ name: "Alice" }));
-socket.emit("echo", JSON.stringify({ name: "Alice" }));
-socket.on("echo", (jsonString) => {
-  console.log(JSON.parse(jsonString));
-});
-socket.on("connect", () => {
-  console.log(socket.id);
-});
+const _id = (id) => {
+  return document.getElementById(id)
+}
 
-socket.on("matched", (jsonString) => {
-  const enemyName = JSON.parse(jsonString).enemyName;
-  OpeningAnimation(enemyName);
-});
 
-window.onload = function () {
+
+const goToEntrance = () => {
+  console.log("goToEntrance")
+  const beginButton = _id("begin-button")
+  const name = _id("name-input").value
+  console.log(`${name} はじめるよ！`)
+  beginButton.disabled = true
+  startSocket(name)
+  _id("entrance_status").innerHTML = "waiting for おまえの対戦相手…"
+}
+
+window.goToEntrance = goToEntrance
+
+
+
+function startSocket(name) {
+  console.log("startSocket")
+  const socket = io("localhost:8000", {
+    path: "/ws/socket.io",
+  });
+  window.socket = socket;
+
+  socket.emit("join", JSON.stringify({ name: name }));
+  socket.emit("echo", JSON.stringify({ name: name }));
+  socket.on("echo", (jsonString) => {
+    console.log(JSON.parse(jsonString), "echoed :)");
+  });
+
+  socket.on("connect", () => {
+    console.log(socket.id);
+  });
+
+  socket.on("matched", (jsonString) => {
+    _id("home").style.display = "none"
+    initGame()
+    const enemyName = JSON.parse(jsonString).enemyName;
+    OpeningAnimation(enemyName);
+  });
+  // ここまで待つ。
+
+  // TODO: エラーハンドリング
+}
+
+window.startDangerously = () => {
+  _id("home").style.display = "none"
+  startSocket()
+  initGame()
+}
+
+// window.onload =
+function initGame() {
+  console.log("initGame")
   const renderer = new THREE.WebGLRenderer();
   window.renderer = renderer;
   const scene = new THREE.Scene();
@@ -42,6 +80,6 @@ window.onload = function () {
 
   // 角はまるく
   const canvasStyle = document.getElementById("canvasWrapper").firstChild.style
-  canvasStyle.borderRadius= "10px"
-  canvasStyle.margin= "0 auto"
+  canvasStyle.borderRadius = "10px"
+  canvasStyle.margin = "0 auto"
 };
