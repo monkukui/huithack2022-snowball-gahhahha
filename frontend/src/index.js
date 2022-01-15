@@ -33,9 +33,12 @@ const opponentType = {
   guest: "host",
 };
 
+const server_url = "https://snowball-gahhahha.herokuapp.com";
+// const server_url = "localhost:8000"
+
 function startSocket(name) {
   console.log("startSocket");
-  const socket = io("localhost:8000", {
+  const socket = io(server_url, {
     path: "/ws/socket.io",
   });
   window.socket = socket;
