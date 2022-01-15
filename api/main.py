@@ -94,6 +94,23 @@ async def gameRequested(socket, req):
     await sio.emit('start', to=req["host"]["socketId"])
     await sio.emit('start', to=req["guest"]["socketId"])
 
+opponentType = {
+    "host": "guest",
+    "guest": "host"
+}
+
+
+@app.sio.on('position')
+async def syncPos(socket, req):
+    # print(socket, req)
+    playerType = ""
+    if(socket == req["room"]["host"]["socketId"]):
+        playerType = "host"
+    else:
+        playerType = "guest"
+    to = req["room"][opponentType[playerType]]["socketId"]
+    await sio.emit("enemyPosition", {"data": req["position"]}, to=to)
+
 
 @app.sio.on('connect')
 async def connect(socket, *args, **kwargs):
@@ -103,6 +120,9 @@ async def connect(socket, *args, **kwargs):
 @app.sio.on('disconnect')
 async def disconnect(reason):
     print(f'disconnected!: {reason}')
+    # room にいるか探す
+    # いたら、もう一人の方に、相手が切断したよと送る。ルームを消す。おわり
+    # いなかったら以下
     await remove_entrance_member(reason)
 
     # 壊れたのが待ってる人だったら、firestoreから消す。

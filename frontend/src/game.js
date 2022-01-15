@@ -8,18 +8,21 @@ export const Game = (enemyName) => {
     syncGenerateSnowball(x, y);
   });
 
-  socket.on("enemyPosition", (jsonString) => {
-    const data = JSON.parse(jsonString).data;
-    const x = data.x;
-    const y = data.y;
+  socket.on("enemyPosition", (data) => {
+    const { x, y } = data.data;
+    console.log(`enemy moved to ${x}, ${y}`)
+    // const data = JSON.parse(jsonString).data;
     syncAnotherPlayer(x, y);
   });
 
-  socket.on("disconnected", () => {});
+  socket.on("disconnected", () => { });
   socket.on("over", (data) => {
     console.log(data);
     console.log("over! 負けたか勝ったかどっちかな～");
   });
+
+  camera.position = new THREE.Vector3(0, -200, 500);
+  camera.rotation.x = 1;
 
   const snowBallInitialZ = 150;
 
@@ -245,6 +248,15 @@ export const Game = (enemyName) => {
     });
   };
 
+  const tickDeleteSnowBall = () => {
+    var balls = scene.children.filter((child) => child.name === "snowball");
+    balls.forEach((ball) => {
+      if (ball.position.z < -10) {
+        scene.remove(ball);
+      }
+    });
+  };
+
   const syncAnotherPlayer = (x, y) => {
     var cylinder2 = scene.getObjectByName("cylinder2");
     cylinder2.position.x = x;
@@ -262,18 +274,31 @@ export const Game = (enemyName) => {
     sphere.name = "snowball";
   };
 
+  let count = 0
+
   function animate() {
     requestAnimationFrame(animate);
-
     tickMoveByKey();
     tickWallBlock();
     tickSnowBallCollision();
+    tickDeleteSnowball();
 
     const frameCount = renderer.info.render.frame;
     if (frameCount % generateSnowBallTicks === 0) {
       tickGenerateSnowBalls();
     }
     tickSnowballsAndShadow();
+
+    if (count === 10) {
+      count = 0
+      // console.log("let's sync position!")
+      // for debug
+      const x = Math.random() * 200 - 100
+      const y = Math.random() * 200 - 100
+      socket.emit("position", { room: room, position: { x: x, y: y } })
+      // TODO: sync position
+    }
+    count++
 
     renderer.render(scene, camera);
   }
