@@ -31,9 +31,7 @@ window.onload = function () {
     0.1,
     1000
   );
-  camera.position.z = 200;
-  camera.position.y = -200;
-  camera.rotation.x = 1;
+  camera.position.z = 100;
   window.camera = camera;
   renderer.setSize(window.innerWidth / 1.2, window.innerHeight / 1.2 - 70);
   // document.body.appendChild(renderer.domElement);
@@ -41,7 +39,7 @@ window.onload = function () {
   OpeningAnimation("Bob");
 
   // 角はまるく
-  const canvasStyle = document.getElementById("canvasWrapper").firstChild.style
-  canvasStyle.borderRadius= "10px"
-  canvasStyle.margin= "0 auto"
+  const canvasStyle = document.getElementById("canvasWrapper").firstChild.style;
+  canvasStyle.borderRadius = "10px";
+  canvasStyle.margin = "0 auto";
 };
