@@ -5,12 +5,12 @@ const destroyScene = (scene) => {
   while (scene.children.length > 0) {
     scene.remove(scene.children[0]);
   }
-}
+};
 
 export const OpeningAnimation = (enemyName) => {
   socket.on("start", () => {
-    destroyScene(scene)
-    cancelAnimationFrame(openingRAFId)
+    destroyScene(scene);
+    cancelAnimationFrame(openingRAFId);
     Game(enemyName);
   });
   // socket.emit("start");
@@ -47,18 +47,8 @@ export const OpeningAnimation = (enemyName) => {
         createdAt: Date.now(),
       });
     }
-    setTimeout(() => {
-      ret.push({
-        name: "openingSnowballCenter" + Math.random().toString(),
-        initialPosition: new THREE.Vector3(0, 0, -30),
-        speed: 10,
-        // direction: new THREE.Vector3(0, -1, 2),
-        direction: new THREE.Vector3(0, -1, 10).normalize(),
-        createdAt: Date.now(),
-      });
 
-      return ret;
-    }, 2000);
+    return ret;
   })();
   window.stats = ballInitialStats;
 
@@ -106,9 +96,9 @@ export const OpeningAnimation = (enemyName) => {
             .normalize()
             .multiplyScalar(
               ballLaunchFactor *
-              ballStats.speed *
-              deltaSecondsFromCreated *
-              ballSpeedFactor
+                ballStats.speed *
+                deltaSecondsFromCreated *
+                ballSpeedFactor
             )
         )
         .sub(
@@ -139,7 +129,7 @@ export const OpeningAnimation = (enemyName) => {
   };
 
   window.tickBalls = tickBalls;
-  window.openingRAFId = ""
+  window.openingRAFId = "";
   function animate() {
     openingRAFId = requestAnimationFrame(animate);
     tickBalls();
