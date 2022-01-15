@@ -5,7 +5,7 @@ from fastapi_socketio import SocketManager
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import random
-from utils import get_entrance, register_room, wait_at_entrance, remove_entrance_member, remove_entrance_member_by_uid
+from utils import get_entrance, register_room, remove_room, search_room, wait_at_entrance, remove_entrance_member, remove_entrance_member_by_uid
 
 app = FastAPI()
 sio = SocketManager(app=app, cors_allowed_origins=[])
@@ -119,9 +119,8 @@ async def syncPos(socket, req):
     await sio.emit("enemyPosition", {"data": req["position"]}, to=to)
 
 
-
 def generate_snowballs_from_count(count):
-    c = 8
+    c = 4
     res = []
     for i in range(c):
         res.append({
@@ -151,12 +150,23 @@ async def disconnect(reason):
     print(f'disconnected!: {reason}')
     # room にいるか探す
     # いたら、もう一人の方に、相手が切断したよと送る。ルームを消す。おわり
-    # いなかったら以下
-    await remove_entrance_member(reason)
-
-    # 壊れたのが待ってる人だったら、firestoreから消す。
+        # 壊れたのが待ってる人(entrance)だったら、firestoreから消す。
+    # socketIdが
     # 壊れたのがプレイ中の人だったら、おわりー！って流す。
     # そして、そのfirestoreも消す。
+
+    room = await search_room(reason)
+    # print(room)
+    # entrance
+    if len(room) == 0:
+        await remove_entrance_member(reason)
+    # room
+    else:
+        # playerType = getPlayerType(socket, req)
+        # await sio.emit("fall", {"data": '接続が切断されました'}, to=req["room"][playerType]["socketId"])
+        await remove_room(reason)
+
+
 
 
 if __name__ == '__main__':
