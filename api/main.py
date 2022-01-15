@@ -39,7 +39,7 @@ async def echo(sid, *args, **kwargs):
 
 @app.get("/")
 async def root():
-    return {"message": "this is root"}
+    return {"message": "this is root root root"}
 
 
 @sio.on('test')
