@@ -10,6 +10,7 @@ const goToEntrance = () => {
   console.log("goToEntrance");
   const beginButton = _id("begin-button");
   const name = _id("name-input").value;
+  _id("name-input").disabled = true;
   console.log(`${name} はじめるよ！`);
   beginButton.disabled = true;
   startSocket(name);
