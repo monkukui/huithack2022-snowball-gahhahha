@@ -28,10 +28,10 @@ export const Game = (enemyName) => {
     cancelAnimationFrame(gameRAFId);
     if (!gameEnded) {
       _id("matchInfo").innerHTML += "<br><br>おまえの勝ち！ガッハッハ";
+      // Over();
       alert(`おまえの勝ち！ガッハッハ`);
     }
     gameEnded = true;
-    // Over();
   });
 
   camera.position.y = -200;
