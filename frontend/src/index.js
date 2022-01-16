@@ -36,9 +36,8 @@ const opponentType = {
 const snowColorCode = 0xcff1ff;
 window.snowColorCode = snowColorCode;
 
-// const server_url = "https://snowball-gahhahha.herokuapp.com";
-const server_url = "localhost:8000"
-
+const server_url = "https://snowball-gahhahha.herokuapp.com";
+// const server_url = "localhost:8000"
 
 function startSocket(name) {
   console.log("startSocket");

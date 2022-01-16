@@ -307,6 +307,20 @@ export const Game = (enemyName) => {
     vector2.normalize();
     self.position.x += vector2.x * speedFactor;
     self.position.y += vector2.y * speedFactor;
+
+    if (vector2.x * vector2.y > 0) {
+      console.log("");
+      self.rotation.z = -Math.PI / 4;
+    }
+    if (vector2.x * vector2.y < 0) {
+      self.rotation.z = Math.PI / 4;
+    }
+    if (vector2.x === 0 && vector2.y > 0) {
+      self.rotation.z = 0;
+    }
+    if (vector2.x > 0 && vector2.y === 0) {
+      self.rotation.z = Math.PI / 2;
+    }
   };
 
   const tickGenerateSnowBalls = () => {
