@@ -169,8 +169,20 @@ export const OpeningAnimation = (enemyName) => {
 
   const tickLastBall = () => {
     const lastBall = scene.getObjectByName("lastSnowball");
-    const direction = lastBall.position.sub(camera.position);
-    lastBall.position.z += ballSpeedFactor;
+    if (lastBall === undefined) {
+      console.log("lastBall is undefined");
+      return;
+    }
+
+    const direction = camera.position
+      .clone()
+      .sub(lastBall.position)
+      .normalize();
+    console.log(direction);
+
+    lastBall.position.x += (direction.x * ballSpeedFactor) / 6;
+    lastBall.position.y += (direction.y * ballSpeedFactor) / 6;
+    lastBall.position.z += (direction.z * ballSpeedFactor) / 6;
   };
 
   window.tickBalls = tickBalls;
@@ -178,7 +190,7 @@ export const OpeningAnimation = (enemyName) => {
   function animate() {
     openingRAFId = requestAnimationFrame(animate);
     tickBalls();
-    // tickLastBall();
+    tickLastBall();
     renderer.render(scene, camera);
   }
   animate();
