@@ -11,14 +11,15 @@ const destroyScene = (scene) => {
 const 準備はいいかな = "準備はいいかな？<br>方向キーを使って操作してね<br>";
 
 export const OpeningAnimation = (enemyName) => {
-  _id("gameStart").innerHTML = `${準備はいいかな}<br>3`;
+  const [me, you] =
+    room.host.socketId == socket.id
+      ? [room.host.name, room.guest.name]
+      : [room.guest.name, room.host.name];
+  _id("matchInfo").innerHTML = `${me} vs ${you}`;
+  _id("gameStart").innerHTML = `${me}<br>vs<br>${you}`;
   _id("gameStart").style.display = "block";
-
   socket.on("start", () => {
-    setTimeout(() => {
-      _id("gameStart").innerHTML = `START!!`;
-      _id("gameStart").style.display = "none";
-    }, 500);
+    _id("gameStart").innerHTML = `${準備はいいかな}<br>3`;
     destroyScene(scene);
     cancelAnimationFrame(openingRAFId);
     Game(enemyName);
@@ -26,10 +27,20 @@ export const OpeningAnimation = (enemyName) => {
 
   setTimeout(() => {
     _id("gameStart").innerHTML = `${準備はいいかな}<br>2`;
-  }, 1000);
+  }, 4000);
   setTimeout(() => {
     _id("gameStart").innerHTML = `${準備はいいかな}<br>1`;
-  }, 2000);
+  }, 5000);
+  setTimeout(() => {
+    _id("gameStart").innerHTML = `${準備はいいかな}<br>0`;
+  }, 6000);
+  setTimeout(() => {
+    _id("gameStart").innerHTML = `START!!`;
+  }, 7000);
+  setTimeout(() => {
+    _id("gameStart").style.display = "none";
+  }, 8000);
+
   setTimeout(() => {
     socket.emit("startGameRequest", window.room);
   }, 3000);
@@ -169,8 +180,20 @@ export const OpeningAnimation = (enemyName) => {
 
   const tickLastBall = () => {
     const lastBall = scene.getObjectByName("lastSnowball");
-    const direction = lastBall.position.sub(camera.position);
-    lastBall.position.z += ballSpeedFactor;
+    if (lastBall === undefined) {
+      console.log("lastBall is undefined");
+      return;
+    }
+
+    const direction = camera.position
+      .clone()
+      .sub(lastBall.position)
+      .normalize();
+    console.log(direction);
+
+    lastBall.position.x += (direction.x * ballSpeedFactor) / 6;
+    lastBall.position.y += (direction.y * ballSpeedFactor) / 6;
+    lastBall.position.z += (direction.z * ballSpeedFactor) / 6;
   };
 
   window.tickBalls = tickBalls;
@@ -178,7 +201,7 @@ export const OpeningAnimation = (enemyName) => {
   function animate() {
     openingRAFId = requestAnimationFrame(animate);
     tickBalls();
-    // tickLastBall();
+    tickLastBall();
     renderer.render(scene, camera);
   }
   animate();

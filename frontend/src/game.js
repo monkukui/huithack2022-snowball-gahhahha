@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { Over } from "./over";
 
+import { _id } from "./index";
+
 let gameEnded = false;
 let snowballFallCount = 0;
 let frameCount = 0;
@@ -25,9 +27,12 @@ export const Game = (enemyName) => {
 
   socket.once("over", (data) => {
     // console.log(data);
-    gameEnded = true;
-    return alert("over! おまえの勝ち！");
     cancelAnimationFrame(gameRAFId);
+    if (!gameEnded) {
+      _id("matchInfo").innerHTML += "<br><br>おまえの勝ち！ガッハッハ";
+      alert(`おまえの勝ち！ガッハッハ`);
+    }
+    gameEnded = true;
     // Over();
   });
 
@@ -403,9 +408,12 @@ export const Game = (enemyName) => {
         ball.position.distanceTo(self.position) <
         playerScale / 3 + ballRadius
       ) {
-        cancelAnimationFrame(gameRAFId);
-        Over();
-        socket.emit("over", { room: room });
+        if (!gameEnded) {
+          cancelAnimationFrame(gameRAFId);
+          Over();
+          socket.emit("over", { room: room });
+        }
+        gameEnded = true;
       }
     });
   };
@@ -476,7 +484,7 @@ export const Game = (enemyName) => {
     gameRAFId = requestAnimationFrame(animate);
     tickMoveByKey();
     tickWallBlock();
-    // tickSnowBallCollision();
+    tickSnowBallCollision();
 
     snowballFallCount += renderer.info.render.frame - frameCount;
     // snowballFallCount += renderer.info.render.frame;
