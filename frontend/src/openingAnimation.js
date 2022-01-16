@@ -11,7 +11,12 @@ const destroyScene = (scene) => {
 const 準備はいいかな = "準備はいいかな？<br>方向キーを使って操作してね<br>";
 
 export const OpeningAnimation = (enemyName) => {
-  _id("gameStart").innerHTML = `hoge vs hoge(仮)`;
+  const [me, you] =
+    room.host.socketId == socket.id
+      ? [room.host.name, room.guest.name]
+      : [room.guest.name, room.host.name];
+  _id("matchInfo").innerHTML = `${me} vs ${you}`;
+  _id("gameStart").innerHTML = `${me}<br>vs<br>${you}`;
   _id("gameStart").style.display = "block";
   socket.on("start", () => {
     _id("gameStart").innerHTML = `${準備はいいかな}<br>3`;
