@@ -10,11 +10,21 @@ export const _id = (id) => {
 
 const md = new MobileDetect(window.navigator.userAgent);
 
+const startWithSolo = () => {
+  console.log("startWithSolo");
+  _id("home").style.display = "none";
+  _id("how-to-play").style.display = "none";
+  _id("footer").style.display = "none";
+  startSocket(undefined, true);
+};
+
+window.startWithSolo = startWithSolo;
 
 if (md.mobile()) {
   _id("home-container").style.display = "none";
   _id("sorry-container").className = "";
-  _id("unsupported-message").innerHTML = "モバイル端末には<br>対応していません…";
+  _id("unsupported-message").innerHTML =
+    "モバイル端末には<br>対応していません…";
 }
 
 const goToEntrance = () => {
@@ -22,6 +32,9 @@ const goToEntrance = () => {
   const beginButton = _id("begin-button");
   const name = _id("name-input").value;
   _id("name-input").disabled = true;
+  _id("startSolo").disabled = true;
+  _id("how-to-play").style.display = "none";
+  _id("footer").style.display = "none";
   console.log(`${name} はじめるよ！`);
   beginButton.disabled = true;
   startSocket(name);
@@ -60,8 +73,8 @@ const server_url =
 
 // const server_url = "https://snowball-gahhahha.herokuapp.com"
 
-function startSocket(name) {
-  console.log("startSocket");
+function startSocket(name, isSolo = false) {
+  console.log("startSocket, isSolo", isSolo);
   const socket = io(server_url, {
     path: "/ws/socket.io",
   });
@@ -76,13 +89,30 @@ function startSocket(name) {
   socket.on("connect", () => {
     console.log(`socket connected with id:${socket.id}`);
     // TODO: join
-    socket.emit(
-      "join",
-      JSON.stringify({
-        name: name,
-        socketId: socket.id,
-      })
-    );
+    if (!isSolo) {
+      socket.emit(
+        "join",
+        JSON.stringify({
+          name: name,
+          socketId: socket.id,
+        })
+      );
+    } else {
+      _id("home").style.display = "none";
+      initGame();
+      window.room = {
+        host: {
+          socketId: socket.id,
+          name: "solo",
+        },
+        guest: {
+          socketId: null,
+          name: null,
+        },
+      };
+      playerType = "host";
+      OpeningAnimation(true); // you
+    }
   });
 
   socket.on("matched", (room) => {
@@ -96,7 +126,7 @@ function startSocket(name) {
       playerType = "guest";
     }
     // マッチングしました！のアニメーション、終わってちょっと待ってから startGameRequest(window.room) を emit する。
-    OpeningAnimation(room[opponentType[playerType]].name); // you
+    OpeningAnimation(); // you
     // 相手のやつ出したかったら
     // opponentType[playerType] です
   });
@@ -109,7 +139,7 @@ window.startDangerously = () => {
   initGame();
 };
 
-// window.onload =
+// opening animation 用の canvas 作成
 function initGame() {
   console.log("initGame");
   const renderer = new THREE.WebGLRenderer();
@@ -133,4 +163,5 @@ function initGame() {
   const canvasStyle = document.getElementById("canvasWrapper").firstChild.style;
   canvasStyle.borderRadius = "10px";
   canvasStyle.margin = "0 auto";
+  console.log("canvas done");
 }

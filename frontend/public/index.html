@@ -46,6 +46,9 @@
       <h4 id="gameStart"
         style="display: inline-block; position: absolute;top: 50%; left: 50%; transform: translate(-50%,-50%); color: deepskyblue; font-weight: bold; font-size: 3rem; font-family: 'Reggae One', cursive;display: none;">
         START!!</h4>
+      <div class="center" style="margin-top:10px;">
+        point: <span id="point" style="font-size: 1.5rem;">0</span>
+      </div>
     </div>
     <div id="matchInfo" style="text-align: center; margin-top: 20px;font-size: 2rem; font-weight: bold;"></div>
     <!-- end canvas wrapper -->
@@ -71,6 +74,10 @@
       </form>
       <div id="entrance_status" style="text-align: center; margin-top: 50px;"></div>
       <!-- 遊び方 -->
+      <div class="center">
+        <button id="startSolo" class="btn amber ligthen-3 grey-text text-darken-4"
+          onclick="startWithSolo()">ソロモードで練習する</button>
+      </div>
     </div>
   </div>
   <div class="hide-on-med-and-up" id="sorry-container">
@@ -88,7 +95,8 @@
       <img src="sorry.jpg" alt="sorry" style="width: 55%; border-radius: 15px;">
     </div>
   </div>
-  <div class="center brown lighten-4 how-to-play"
+
+  <div id="how-to-play" class="center brown lighten-4 how-to-play"
     style="margin:60px auto; padding: 20px; border-radius: 10px; width: 50%;">
     <h5>遊び方</h5>
     <ul>
@@ -98,7 +106,8 @@
     </ul>
     <img src="play-screenshot.png" alt="" style="width: 65%;">
   </div>
-  <div class="center" style="margin:60px auto;">
+
+  <div class="center" id="footer" style="margin:60px auto;">
     <a href="https://github.com/HUITGroup/huithack2022-snowball-gahhahha" target="_blank">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#333">
         <path

@@ -1,4 +1,13 @@
-import * as THREE from "three";
+import {
+  MeshBasicMaterial,
+  PlaneGeometry,
+  SphereGeometry,
+  CylinderGeometry,
+  BoxGeometry,
+  CircleGeometry,
+  Mesh,
+  Group,
+} from "three";
 import { Over } from "./over";
 
 import { _id } from "./index";
@@ -7,26 +16,38 @@ let gameEnded = false;
 let snowballFallCount = 0;
 let frameCount = 0;
 
-export const Game = (enemyName) => {
+export const Game = (isSolo = false) => {
+  let lastBall = [null];
+
   socket.on("fall", (jsonString) => {
     const data = jsonString.data;
-    data.forEach((s) => {
-      const { x, y } = s;
-      syncGenerateSnowball(x, y);
-    });
+    if (lastBall[0]?.x === data[0].x) {
+      // なにもしない
+    } else {
+      lastBall = data;
+      // console.log(data.length)
+      data.forEach((s) => {
+        console.log(s);
+        const { x, y } = s;
+        syncGenerateSnowball(x, y);
+      });
+    }
   });
 
-  socket.on("enemyPosition", (data) => {
-    const { x, y } = data.data;
-    // console.log(`enemy moved to ${x}, ${y}`);
-    // const data = JSON.parse(jsonString).data;
-    syncAnotherPlayer(x, y);
-  });
+  if (!isSolo) {
+    socket.on("enemyPosition", (data) => {
+      const { x, y } = data.data;
+      // console.log(`enemy moved to ${x}, ${y}`);
+      // const data = JSON.parse(jsonString).data;
+      syncAnotherPlayer(x, y);
+    });
+  }
 
   socket.on("disconnected", () => {});
 
   socket.once("over", (data) => {
     // console.log(data);
+    gamePlaying = false;
     cancelAnimationFrame(gameRAFId);
     if (!gameEnded) {
       _id("matchInfo").innerHTML += "<br><br>おまえの勝ち！ガッハッハ";
@@ -43,27 +64,27 @@ export const Game = (enemyName) => {
 
   const snowBallInitialZ = 150;
 
-  const materialPlayer1 = new THREE.MeshBasicMaterial({
+  const materialPlayer1 = new MeshBasicMaterial({
     color: 0xf26690,
   });
-  const materialPlayer2 = new THREE.MeshBasicMaterial({
+  const materialPlayer2 = new MeshBasicMaterial({
     color: 0xde864e,
   });
 
-  const materialFloor = new THREE.MeshBasicMaterial({
+  const materialFloor = new MeshBasicMaterial({
     color: 0xd3d7db,
   });
 
-  const materialShadow = new THREE.MeshBasicMaterial({
+  const materialShadow = new MeshBasicMaterial({
     color: 0x8b8b8b,
   });
 
   const playerScale = 30;
   const ballRadius = 14;
   const generateSnowBallTicks = 35;
-  let requestSnowBallTicks = 6 * 60;
+  let requestSnowBallTicks = 3 * 150;
   const requestSnowBallTicksDown = 40;
-  const requestSnowBallTicksMin = 60;
+  const requestSnowBallTicksMin = 150;
   const emitPositionTicks = 3;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
@@ -78,34 +99,34 @@ export const Game = (enemyName) => {
   const speedFactor = 2;
 
   const makeFloor = () => {
-    const geometry = new THREE.PlaneGeometry(floorScale, floorScale);
+    const geometry = new PlaneGeometry(floorScale, floorScale);
 
-    const mesh = new THREE.Mesh(geometry, materialFloor);
+    const mesh = new Mesh(geometry, materialFloor);
     mesh.name = "floor";
     scene.add(mesh);
   };
   makeFloor();
 
   const makePlayer1 = () => {
-    const headGeometry = new THREE.SphereGeometry(playerScale * 0.1, 32);
-    const neckGeometry = new THREE.CylinderGeometry(
+    const headGeometry = new SphereGeometry(playerScale * 0.1, 32);
+    const neckGeometry = new CylinderGeometry(
       playerScale * 0.1,
       playerScale * 0.1,
       playerScale * 0.1,
       32
     );
-    const torsoGeometry = new THREE.BoxGeometry(
+    const torsoGeometry = new BoxGeometry(
       playerScale * 0.2,
       playerScale * 0.4,
       playerScale * 0.2
     );
-    const armGeometry = new THREE.CylinderGeometry(
+    const armGeometry = new CylinderGeometry(
       playerScale * 0.05,
       playerScale * 0.05,
       playerScale * 0.35,
       32
     );
-    const legGeometry = new THREE.CylinderGeometry(
+    const legGeometry = new CylinderGeometry(
       playerScale * 0.05,
       playerScale * 0.05,
       playerScale * 0.4,
@@ -113,42 +134,42 @@ export const Game = (enemyName) => {
     );
     const material = materialPlayer1;
 
-    const head = new THREE.Mesh(headGeometry, material);
+    const head = new Mesh(headGeometry, material);
     head.position.z = playerScale * 0.9;
 
-    const neck = new THREE.Mesh(neckGeometry, material);
+    const neck = new Mesh(neckGeometry, material);
     neck.position.z = playerScale * 0.8;
     neck.rotation.x = Math.PI / 2;
 
-    const torso = new THREE.Mesh(torsoGeometry, material);
+    const torso = new Mesh(torsoGeometry, material);
     torso.position.z = playerScale * 0.6;
     torso.rotation.x = Math.PI / 2;
 
-    const arm_l = new THREE.Mesh(armGeometry, material);
+    const arm_l = new Mesh(armGeometry, material);
     arm_l.position.x = -playerScale * 0.15;
     arm_l.position.z = playerScale * 0.6;
     arm_l.rotation.x = Math.PI / 2;
     arm_l.rotation.z = Math.PI * -0.1;
 
-    const arm_r = new THREE.Mesh(armGeometry, material);
+    const arm_r = new Mesh(armGeometry, material);
     arm_r.position.x = playerScale * 0.15;
     arm_r.position.z = playerScale * 0.6;
     arm_r.rotation.x = Math.PI / 2;
     arm_r.rotation.z = Math.PI * 0.1;
 
-    const leg_l = new THREE.Mesh(legGeometry, material);
+    const leg_l = new Mesh(legGeometry, material);
     leg_l.position.x = -playerScale * 0.07;
     leg_l.position.z = playerScale * 0.2;
     leg_l.rotation.x = Math.PI / 2;
     leg_l.rotation.z = Math.PI * -0.05;
 
-    const leg_r = new THREE.Mesh(legGeometry, material);
+    const leg_r = new Mesh(legGeometry, material);
     leg_r.position.x = playerScale * 0.07;
     leg_r.position.z = playerScale * 0.2;
     leg_r.rotation.x = Math.PI / 2;
     leg_r.rotation.z = Math.PI * 0.05;
 
-    const group = new THREE.Group();
+    const group = new Group();
     group.add(head);
     group.add(neck);
     group.add(torso);
@@ -163,25 +184,25 @@ export const Game = (enemyName) => {
   makePlayer1();
 
   const makePlayer2 = () => {
-    const headGeometry = new THREE.SphereGeometry(playerScale * 0.1, 32);
-    const neckGeometry = new THREE.CylinderGeometry(
+    const headGeometry = new SphereGeometry(playerScale * 0.1, 32);
+    const neckGeometry = new CylinderGeometry(
       playerScale * 0.1,
       playerScale * 0.1,
       playerScale * 0.1,
       32
     );
-    const torsoGeometry = new THREE.BoxGeometry(
+    const torsoGeometry = new BoxGeometry(
       playerScale * 0.2,
       playerScale * 0.4,
       playerScale * 0.2
     );
-    const armGeometry = new THREE.CylinderGeometry(
+    const armGeometry = new CylinderGeometry(
       playerScale * 0.05,
       playerScale * 0.05,
       playerScale * 0.35,
       32
     );
-    const legGeometry = new THREE.CylinderGeometry(
+    const legGeometry = new CylinderGeometry(
       playerScale * 0.05,
       playerScale * 0.05,
       playerScale * 0.4,
@@ -190,42 +211,42 @@ export const Game = (enemyName) => {
 
     const material = materialPlayer2;
 
-    const head = new THREE.Mesh(headGeometry, material);
+    const head = new Mesh(headGeometry, material);
     head.position.z = playerScale * 0.9;
 
-    const neck = new THREE.Mesh(neckGeometry, material);
+    const neck = new Mesh(neckGeometry, material);
     neck.position.z = playerScale * 0.8;
     neck.rotation.x = Math.PI / 2;
 
-    const torso = new THREE.Mesh(torsoGeometry, material);
+    const torso = new Mesh(torsoGeometry, material);
     torso.position.z = playerScale * 0.6;
     torso.rotation.x = Math.PI / 2;
 
-    const arm_l = new THREE.Mesh(armGeometry, material);
+    const arm_l = new Mesh(armGeometry, material);
     arm_l.position.x = -playerScale * 0.15;
     arm_l.position.z = playerScale * 0.6;
     arm_l.rotation.x = Math.PI / 2;
     arm_l.rotation.z = Math.PI * -0.1;
 
-    const arm_r = new THREE.Mesh(armGeometry, material);
+    const arm_r = new Mesh(armGeometry, material);
     arm_r.position.x = playerScale * 0.15;
     arm_r.position.z = playerScale * 0.6;
     arm_r.rotation.x = Math.PI / 2;
     arm_r.rotation.z = Math.PI * 0.1;
 
-    const leg_l = new THREE.Mesh(legGeometry, material);
+    const leg_l = new Mesh(legGeometry, material);
     leg_l.position.x = -playerScale * 0.07;
     leg_l.position.z = playerScale * 0.2;
     leg_l.rotation.x = Math.PI / 2;
     leg_l.rotation.z = Math.PI * -0.05;
 
-    const leg_r = new THREE.Mesh(legGeometry, material);
+    const leg_r = new Mesh(legGeometry, material);
     leg_r.position.x = playerScale * 0.07;
     leg_r.position.z = playerScale * 0.2;
     leg_r.rotation.x = Math.PI / 2;
     leg_r.rotation.z = Math.PI * 0.05;
 
-    const group = new THREE.Group();
+    const group = new Group();
     group.add(head);
     group.add(neck);
     group.add(torso);
@@ -236,7 +257,9 @@ export const Game = (enemyName) => {
     group.name = "p2";
     scene.add(group);
   };
-  makePlayer2();
+  if (!isSolo) {
+    makePlayer2();
+  }
 
   const getSelf = () => {
     return scene.getObjectByName(playerType === "host" ? "p1" : "p2");
@@ -332,22 +355,6 @@ export const Game = (enemyName) => {
     }
   };
 
-  const tickGenerateSnowBalls = () => {
-    var geometry = new THREE.SphereGeometry(
-      ballRadius,
-      snowballMeshQuality,
-      snowballMeshQuality
-    );
-    var material = new THREE.MeshBasicMaterial({ color: snowColorCode });
-    var sphere = new THREE.Mesh(geometry, material);
-    const boundBoxVertical = floorScale - ballRadius * 2;
-    sphere.position.x = Math.random() * boundBoxVertical - boundBoxVertical / 2;
-    sphere.position.y = Math.random() * boundBoxVertical - boundBoxVertical / 2;
-    sphere.position.z = snowBallInitialZ;
-    scene.add(sphere);
-    sphere.name = "snowball";
-  };
-
   const tickSnowballsAndShadow = () => {
     const deleteShadow = () => {
       var shadows = scene.children.filter(
@@ -366,14 +373,17 @@ export const Game = (enemyName) => {
           ((snowBallInitialZ - ball.position.z + 1) / 20) * snowballSpeedFactor;
         if (ball.position.z < 0) {
           scene.remove(ball);
+          if (!gamePlaying) {
+            _id("point").innerHTML = parseInt(_id("point").innerHTML) + 10;
+          }
         }
       };
       move();
 
       const makeShadow = () => {
-        const geometry = new THREE.CircleGeometry(ballRadius, 32);
+        const geometry = new CircleGeometry(ballRadius, 32);
         const material = materialShadow;
-        const shadow = new THREE.Mesh(geometry, material);
+        const shadow = new Mesh(geometry, material);
         shadow.name = "snowballShadow";
         shadow.position.x = ball.position.x;
         shadow.position.y = ball.position.y;
@@ -447,13 +457,13 @@ export const Game = (enemyName) => {
   };
 
   const syncGenerateSnowball = (x, y) => {
-    var geometry = new THREE.SphereGeometry(
+    var geometry = new SphereGeometry(
       ballRadius,
       snowballMeshQuality,
       snowballMeshQuality
     );
-    var material = new THREE.MeshBasicMaterial({ color: snowColorCode });
-    var sphere = new THREE.Mesh(geometry, material);
+    var material = new MeshBasicMaterial({ color: snowColorCode });
+    var sphere = new Mesh(geometry, material);
     sphere.position.x = x;
     sphere.position.y = y;
     sphere.position.z = snowBallInitialZ;
@@ -484,7 +494,7 @@ export const Game = (enemyName) => {
     tickMoveByKey();
     tickWallBlock();
     tickSnowBallCollision();
-
+    // console.log(renderer.info.render.frame)
     snowballFallCount += renderer.info.render.frame - frameCount;
     // snowballFallCount += renderer.info.render.frame;
     frameCount = renderer.info.render.frame;
@@ -495,7 +505,7 @@ export const Game = (enemyName) => {
 
     // if (frameCount % requestSnowBallTicks === 0) {
     if (snowballFallCount >= requestSnowBallTicks) {
-      if (playerType === "host") {
+      if (playerType === "host" && gamePlaying) {
         snowballFallCount -= requestSnowBallTicks;
         requestSnowBallTicks = Math.max(
           requestSnowBallTicks - requestSnowBallTicksDown,
@@ -507,7 +517,7 @@ export const Game = (enemyName) => {
     }
     tickSnowballsAndShadow();
 
-    if (frameCount % emitPositionTicks === 0) {
+    if (frameCount % emitPositionTicks === 0 && !isSolo) {
       emitSelfPosition();
     }
 

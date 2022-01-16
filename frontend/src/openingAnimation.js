@@ -10,19 +10,25 @@ const destroyScene = (scene) => {
 
 const 準備はいいかな = "準備はいいかな？<br>方向キーを使って操作してね<br>";
 
-export const OpeningAnimation = (enemyName) => {
-  const [me, you] =
-    room.host.socketId == socket.id
-      ? [room.host.name, room.guest.name]
-      : [room.guest.name, room.host.name];
-  _id("matchInfo").innerHTML = `${me} vs ${you}`;
-  _id("gameStart").innerHTML = `${me}<br>vs<br>${you}`;
-  _id("gameStart").style.display = "block";
+window.gamePlaying = false;
+
+export const OpeningAnimation = (isSolo = false) => {
+  let me, you;
+  if (isSolo) {
+    _id("matchInfo").innerHTML = `ソロモード`;
+    _id("gameStart").innerHTML = `ソロモード`;
+    _id("gameStart").style.display = "block";
+  } else {
+    [me, you] =
+      room.host.socketId == socket.id
+        ? [room.host.name, room.guest.name]
+        : [room.guest.name, room.host.name];
+  }
   socket.on("start", () => {
     _id("gameStart").innerHTML = `${準備はいいかな}<br>3`;
     destroyScene(scene);
     cancelAnimationFrame(openingRAFId);
-    Game(enemyName);
+    Game(isSolo);
   });
 
   setTimeout(() => {
@@ -36,6 +42,7 @@ export const OpeningAnimation = (enemyName) => {
   }, 6000);
   setTimeout(() => {
     _id("gameStart").innerHTML = `START!!`;
+    gamePlaying = true;
   }, 7000);
   setTimeout(() => {
     _id("gameStart").style.display = "none";
