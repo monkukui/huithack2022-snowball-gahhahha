@@ -2,9 +2,20 @@ import { io } from "socket.io-client";
 import * as THREE from "three";
 import { OpeningAnimation } from "./openingAnimation";
 
+import MobileDetect from "mobile-detect";
+
 export const _id = (id) => {
   return document.getElementById(id);
 };
+
+const md = new MobileDetect(window.navigator.userAgent);
+
+
+if (md.mobile()) {
+  _id("home-container").style.display = "none";
+  _id("sorry-container").className = "";
+  _id("unsupported-message").innerHTML = "モバイル端末には<br>対応していません…";
+}
 
 const goToEntrance = () => {
   console.log("goToEntrance");
