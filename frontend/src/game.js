@@ -4,6 +4,8 @@ import { Over } from "./over";
 import { _id } from "./index";
 
 let gameEnded = false;
+let snowballFallCount = 0;
+let frameCount = 0;
 
 export const Game = (enemyName) => {
   socket.on("fall", (jsonString) => {
@@ -59,7 +61,9 @@ export const Game = (enemyName) => {
   const playerScale = 30;
   const ballRadius = 14;
   const generateSnowBallTicks = 35;
-  const requestSnowBallTicks = 6 * 60;
+  let requestSnowBallTicks = 6 * 60;
+  const requestSnowBallTicksDown = 40;
+  const requestSnowBallTicksMin = 60;
   const emitPositionTicks = 3;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
@@ -482,14 +486,19 @@ export const Game = (enemyName) => {
     tickWallBlock();
     tickSnowBallCollision();
 
-    const frameCount = renderer.info.render.frame;
+    snowballFallCount += renderer.info.render.frame - frameCount;
+    // snowballFallCount += renderer.info.render.frame;
+    frameCount = renderer.info.render.frame;
     // if (frameCount % generateSnowBallTicks === 0) {
     //   tickGenerateSnowBalls();
     // }
     let snowBallCount = 0; // 何ターン目か。
 
-    if (frameCount % requestSnowBallTicks === 0) {
+    // if (frameCount % requestSnowBallTicks === 0) {
+    if (snowballFallCount >= requestSnowBallTicks) {
       if (playerType === "host") {
+        snowballFallCount -= requestSnowBallTicks;
+        requestSnowBallTicks = Math.max(requestSnowBallTicks - requestSnowBallTicksDown,requestSnowBallTicksMin);
         tickRequestFallSnowBall(snowBallCount);
         snowBallCount++;
       }
