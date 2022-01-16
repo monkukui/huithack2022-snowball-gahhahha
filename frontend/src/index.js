@@ -18,7 +18,7 @@ if (md.mobile()) {
 }
 
 const goToEntrance = () => {
-  console.log("goToEntrance");
+  // console.log("goToEntrance");
   const beginButton = _id("begin-button");
   const name = _id("name-input").value;
   _id("name-input").disabled = true;
@@ -74,7 +74,7 @@ function startSocket(name) {
   });
 
   socket.on("connect", () => {
-    console.log(socket.id);
+    console.log(`socket connected with id:${socket.id}`);
     // TODO: join
     socket.emit(
       "join",

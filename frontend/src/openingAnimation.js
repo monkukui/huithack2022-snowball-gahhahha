@@ -181,7 +181,7 @@ export const OpeningAnimation = (enemyName) => {
   const tickLastBall = () => {
     const lastBall = scene.getObjectByName("lastSnowball");
     if (lastBall === undefined) {
-      console.log("lastBall is undefined");
+      // console.log("lastBall is undefined");
       return;
     }
 
@@ -189,7 +189,7 @@ export const OpeningAnimation = (enemyName) => {
       .clone()
       .sub(lastBall.position)
       .normalize();
-    console.log(direction);
+    // console.log(direction);
 
     lastBall.position.x += (direction.x * ballSpeedFactor) / 6;
     lastBall.position.y += (direction.y * ballSpeedFactor) / 6;

@@ -318,7 +318,7 @@ export const Game = (enemyName) => {
     self.position.y += vector2.y * speedFactor;
 
     if (vector2.x * vector2.y > 0) {
-      console.log("");
+      // console.log("");
       self.rotation.z = -Math.PI / 4;
     }
     if (vector2.x * vector2.y < 0) {
@@ -424,18 +424,17 @@ export const Game = (enemyName) => {
     var enemy = getEnemy();
     (() => {
       if (enemyLastX === undefined || enemyLastY === undefined) {
-        console.log("returnByUndefined");
+        // console.log("returnByUndefined");
         return;
       }
       if (x === enemyLastX) {
         enemy.rotation.z = 0;
-        console.log("x===enemyLastX");
-
+        // console.log("x===enemyLastX");
         return;
       }
-      console.log(
-        "atan:" + Math.atan((y - enemyLastY) / (x - enemyLastX)) + Math.PI / 2
-      );
+      // console.log(
+      //   "atan:" + Math.atan((y - enemyLastY) / (x - enemyLastX)) + Math.PI / 2
+      // );
 
       enemy.rotation.z =
         Math.atan((y - enemyLastY) / (x - enemyLastX)) + Math.PI / 2;
@@ -498,7 +497,10 @@ export const Game = (enemyName) => {
     if (snowballFallCount >= requestSnowBallTicks) {
       if (playerType === "host") {
         snowballFallCount -= requestSnowBallTicks;
-        requestSnowBallTicks = Math.max(requestSnowBallTicks - requestSnowBallTicksDown,requestSnowBallTicksMin);
+        requestSnowBallTicks = Math.max(
+          requestSnowBallTicks - requestSnowBallTicksDown,
+          requestSnowBallTicksMin
+        );
         tickRequestFallSnowBall(snowBallCount);
         snowBallCount++;
       }
