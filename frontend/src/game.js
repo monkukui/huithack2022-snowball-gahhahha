@@ -315,10 +315,10 @@ export const Game = (enemyName) => {
     if (vector2.x * vector2.y < 0) {
       self.rotation.z = Math.PI / 4;
     }
-    if (vector2.x === 0 && vector2.y > 0) {
+    if (vector2.x === 0 && Math.abs(vector2.y) > 0) {
       self.rotation.z = 0;
     }
-    if (vector2.x > 0 && vector2.y === 0) {
+    if (Math.abs(vector2.x) > 0 && vector2.y === 0) {
       self.rotation.z = Math.PI / 2;
     }
   };
@@ -406,10 +406,33 @@ export const Game = (enemyName) => {
     });
   };
 
+  let enemyLastX = undefined;
+  let enemyLastY = undefined;
   const syncAnotherPlayer = (x, y) => {
     var enemy = getEnemy();
+    (() => {
+      if (enemyLastX === undefined || enemyLastY === undefined) {
+        console.log("returnByUndefined");
+        return;
+      }
+      if (x === enemyLastX) {
+        enemy.rotation.z = 0;
+        console.log("x===enemyLastX");
+
+        return;
+      }
+      console.log(
+        "atan:" + Math.atan((y - enemyLastY) / (x - enemyLastX)) + Math.PI / 2
+      );
+
+      enemy.rotation.z =
+        Math.atan((y - enemyLastY) / (x - enemyLastX)) + Math.PI / 2;
+    })();
+
     enemy.position.x = x;
     enemy.position.y = y;
+    enemyLastX = x;
+    enemyLastY = y;
   };
 
   const syncGenerateSnowball = (x, y) => {
@@ -449,7 +472,7 @@ export const Game = (enemyName) => {
     gameRAFId = requestAnimationFrame(animate);
     tickMoveByKey();
     tickWallBlock();
-    tickSnowBallCollision();
+    // tickSnowBallCollision();
 
     const frameCount = renderer.info.render.frame;
     // if (frameCount % generateSnowBallTicks === 0) {
