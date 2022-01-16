@@ -472,7 +472,7 @@ export const Game = (enemyName) => {
     gameRAFId = requestAnimationFrame(animate);
     tickMoveByKey();
     tickWallBlock();
-    // tickSnowBallCollision();
+    tickSnowBallCollision();
 
     const frameCount = renderer.info.render.frame;
     // if (frameCount % generateSnowBallTicks === 0) {
