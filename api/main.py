@@ -18,7 +18,8 @@ origins = [
     "http://localhost:8080",
     "http://localhost",
     "http://127.0.0.1:5500",
-    "https://snowball-gahhahha.herokuapp.com"
+    "https://snowball-gahhahha.herokuapp.com",
+    "https://snow-ball-gahhahha.web.app"
 ]
 
 app.add_middleware(
