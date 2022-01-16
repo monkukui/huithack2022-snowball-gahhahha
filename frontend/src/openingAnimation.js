@@ -11,10 +11,10 @@ const destroyScene = (scene) => {
 const 準備はいいかな = "準備はいいかな？<br>方向キーを使って操作してね<br>";
 
 export const OpeningAnimation = (enemyName) => {
-  _id("gameStart").innerHTML = `${準備はいいかな}<br>3`;
+  _id("gameStart").innerHTML = `hoge vs hoge(仮)`;
   _id("gameStart").style.display = "block";
-
   socket.on("start", () => {
+    _id("gameStart").innerHTML = `${準備はいいかな}<br>3`;
     destroyScene(scene);
     cancelAnimationFrame(openingRAFId);
     Game(enemyName);
@@ -22,23 +22,23 @@ export const OpeningAnimation = (enemyName) => {
 
   setTimeout(() => {
     _id("gameStart").innerHTML = `${準備はいいかな}<br>2`;
-  }, 1000);
-  setTimeout(() => {
-    _id("gameStart").innerHTML = `${準備はいいかな}<br>1`;
-  }, 2000);
-  setTimeout(() => {
-    _id("gameStart").innerHTML = `${準備はいいかな}<br>0`;
-  }, 3000);
-  setTimeout(() => {
-    _id("gameStart").innerHTML = `START!!`;
   }, 4000);
   setTimeout(() => {
-    _id("gameStart").style.display = "none";
+    _id("gameStart").innerHTML = `${準備はいいかな}<br>1`;
   }, 5000);
+  setTimeout(() => {
+    _id("gameStart").innerHTML = `${準備はいいかな}<br>0`;
+  }, 6000);
+  setTimeout(() => {
+    _id("gameStart").innerHTML = `START!!`;
+  }, 7000);
+  setTimeout(() => {
+    _id("gameStart").style.display = "none";
+  }, 8000);
 
-  // setTimeout(() => {
-  socket.emit("startGameRequest", window.room);
-  // }, 0);
+  setTimeout(() => {
+    socket.emit("startGameRequest", window.room);
+  }, 3000);
 
   const ballRadius = 10;
   const ballCount = 8;
