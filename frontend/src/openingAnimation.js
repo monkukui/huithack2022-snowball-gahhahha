@@ -50,6 +50,7 @@ export const OpeningAnimation = (isSolo = false) => {
 
   setTimeout(() => {
     socket.emit("startGameRequest", window.room);
+    _id("point-container").style.display = "block";
   }, 3000);
 
   const ballRadius = 10;
