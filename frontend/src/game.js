@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { Over } from "./over";
 
+let gameEnded = false;
+
 export const Game = (enemyName) => {
   socket.on("fall", (jsonString) => {
     const data = jsonString.data;
@@ -18,10 +20,13 @@ export const Game = (enemyName) => {
   });
 
   socket.on("disconnected", () => {});
-  socket.on("over", (data) => {
+
+  socket.once("over", (data) => {
     console.log(data);
-    console.log("over! 負けたか勝ったかどっちかな～");
-    Over();
+    gameEnded = true;
+    return alert("over! おまえの勝ち！");
+    cancelAnimationFrame(gameRAFId);
+    // Over();
   });
 
   camera.position.y = -200;
@@ -382,6 +387,7 @@ export const Game = (enemyName) => {
       ) {
         cancelAnimationFrame(gameRAFId);
         Over();
+        socket.emit("over", { room: room });
       }
     });
   };

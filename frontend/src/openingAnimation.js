@@ -1,5 +1,6 @@
 import { Game } from "./game";
 import * as THREE from "three";
+import { _id } from "./index";
 
 const destroyScene = (scene) => {
   while (scene.children.length > 0) {
@@ -7,12 +8,28 @@ const destroyScene = (scene) => {
   }
 };
 
+const 準備はいいかな = "準備はいいかな？<br>方向キーを使って操作してね<br>";
+
 export const OpeningAnimation = (enemyName) => {
+  _id("gameStart").innerHTML = `${準備はいいかな}<br>3`;
+  _id("gameStart").style.display = "block";
+
   socket.on("start", () => {
+    setTimeout(() => {
+      _id("gameStart").innerHTML = `START!!`;
+      _id("gameStart").style.display = "none";
+    }, 500);
     destroyScene(scene);
     cancelAnimationFrame(openingRAFId);
     Game(enemyName);
   });
+
+  setTimeout(() => {
+    _id("gameStart").innerHTML = `${準備はいいかな}<br>2`;
+  }, 1000);
+  setTimeout(() => {
+    _id("gameStart").innerHTML = `${準備はいいかな}<br>1`;
+  }, 2000);
   setTimeout(() => {
     socket.emit("startGameRequest", window.room);
   }, 3000);

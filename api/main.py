@@ -140,6 +140,13 @@ async def requestFall(socket, req):  # roomくる前提
     await sio.emit("fall", {"data": res}, to=to2)
 
 
+@app.sio.on("over")
+async def over(socket, req):
+    playerType = getPlayerType(socket, req)
+    to = req["room"][opponentType[playerType]]["socketId"]
+    await sio.emit('over', to=to)
+
+
 @app.sio.on('connect')
 async def connect(socket, *args, **kwargs):
     print("connected!")
@@ -150,7 +157,7 @@ async def disconnect(reason):
     print(f'disconnected!: {reason}')
     # room にいるか探す
     # いたら、もう一人の方に、相手が切断したよと送る。ルームを消す。おわり
-        # 壊れたのが待ってる人(entrance)だったら、firestoreから消す。
+    # 壊れたのが待ってる人(entrance)だったら、firestoreから消す。
     # socketIdが
     # 壊れたのがプレイ中の人だったら、おわりー！って流す。
     # そして、そのfirestoreも消す。
@@ -165,8 +172,6 @@ async def disconnect(reason):
         # playerType = getPlayerType(socket, req)
         # await sio.emit("fall", {"data": '接続が切断されました'}, to=req["room"][playerType]["socketId"])
         await remove_room(reason)
-
-
 
 
 if __name__ == '__main__':

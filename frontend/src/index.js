@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 import * as THREE from "three";
 import { OpeningAnimation } from "./openingAnimation";
 
-const _id = (id) => {
+export const _id = (id) => {
   return document.getElementById(id);
 };
 
@@ -36,8 +36,9 @@ const opponentType = {
 const snowColorCode = 0xcff1ff;
 window.snowColorCode = snowColorCode;
 
-const server_url = "https://snowball-gahhahha.herokuapp.com";
-// const server_url = "localhost:8000"
+// const server_url = "https://snowball-gahhahha.herokuapp.com";
+const server_url = "localhost:8000"
+
 
 function startSocket(name) {
   console.log("startSocket");

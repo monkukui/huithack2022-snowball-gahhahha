@@ -9,6 +9,7 @@ const offsetZ = floorScale / 2;
 let endingMeshCreatedAt = undefined;
 let endingMeshInitialZ = undefined;
 let fontLoaded = false;
+
 export const Over = async () => {
   const generateEndingMesh = async () => {
     const endingMesh = new THREE.Mesh(
@@ -63,7 +64,7 @@ export const Over = async () => {
   await generateEndingMesh();
 
   const tickEndingMesh = () => {
-    console.log("tickEndingMesh");
+    // console.log("tickEndingMesh");
     const endingMesh = scene.getObjectByName("endingMesh");
     const deltaSecondsFromCreated = (Date.now() - endingMeshCreatedAt) / 1000;
     if (deltaSecondsFromCreated > 4) {
