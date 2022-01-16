@@ -15,10 +15,6 @@ export const OpeningAnimation = (enemyName) => {
   _id("gameStart").style.display = "block";
 
   socket.on("start", () => {
-    setTimeout(() => {
-      _id("gameStart").innerHTML = `START!!`;
-      _id("gameStart").style.display = "none";
-    }, 500);
     destroyScene(scene);
     cancelAnimationFrame(openingRAFId);
     Game(enemyName);
@@ -31,8 +27,18 @@ export const OpeningAnimation = (enemyName) => {
     _id("gameStart").innerHTML = `${準備はいいかな}<br>1`;
   }, 2000);
   setTimeout(() => {
-    socket.emit("startGameRequest", window.room);
+    _id("gameStart").innerHTML = `${準備はいいかな}<br>0`;
   }, 3000);
+  setTimeout(() => {
+    _id("gameStart").innerHTML = `START!!`;
+  }, 4000);
+  setTimeout(() => {
+    _id("gameStart").style.display = "none";
+  }, 5000);
+
+  // setTimeout(() => {
+  socket.emit("startGameRequest", window.room);
+  // }, 0);
 
   const ballRadius = 10;
   const ballCount = 8;

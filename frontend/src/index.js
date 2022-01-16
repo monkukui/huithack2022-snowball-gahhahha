@@ -13,7 +13,11 @@ const goToEntrance = () => {
   console.log(`${name} はじめるよ！`);
   beginButton.disabled = true;
   startSocket(name);
-  _id("entrance_status").innerHTML = "waiting for おまえの対戦相手…";
+  _id(
+    "entrance_status"
+  ).innerHTML = `対戦相手を探しています...<br> <div style="margin-top:30px"> <div class="progress blue lighten-3">
+  <div class="indeterminate indigo"></div>
+</div>`;
 };
 
 window.goToEntrance = goToEntrance;
