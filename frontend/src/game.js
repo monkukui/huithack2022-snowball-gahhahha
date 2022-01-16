@@ -22,7 +22,7 @@ export const Game = (enemyName) => {
   socket.on("disconnected", () => {});
 
   socket.once("over", (data) => {
-    console.log(data);
+    // console.log(data);
     gameEnded = true;
     return alert("over! おまえの勝ち！");
     cancelAnimationFrame(gameRAFId);
