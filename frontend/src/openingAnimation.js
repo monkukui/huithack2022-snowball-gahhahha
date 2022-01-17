@@ -13,17 +13,19 @@ const 準備はいいかな = "準備はいいかな？<br>方向キーを使っ
 window.gamePlaying = false;
 
 export const OpeningAnimation = (isSolo = false) => {
-  let me, you;
+  _id("gameStart").style.display = "block";
   if (isSolo) {
     _id("matchInfo").innerHTML = `ソロモード`;
     _id("gameStart").innerHTML = `ソロモード`;
-    _id("gameStart").style.display = "block";
   } else {
-    [me, you] =
+    const [me, you] =
       room.host.socketId == socket.id
         ? [room.host.name, room.guest.name]
         : [room.guest.name, room.host.name];
+    _id("matchInfo").innerHTML = `${me} vs ${you}`;
+    _id("gameStart").innerHTML = `${me}<br>vs<br>${you}`;
   }
+
   socket.on("start", () => {
     _id("gameStart").innerHTML = `${準備はいいかな}<br>3`;
     destroyScene(scene);
