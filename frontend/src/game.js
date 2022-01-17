@@ -16,11 +16,18 @@ let gameEnded = false;
 let snowballFallCount = 0;
 let frameCount = 0;
 
+let reachedMaxSnowballs = false;
+let reachedMaxSpeed = false;
+
 export const Game = (isSolo = false) => {
   let lastBall = [null];
 
   socket.on("fall", (jsonString) => {
     const data = jsonString.data;
+    if (data.length == 20 && !reachedMaxSnowballs) {
+      reachedMaxSnowballs = true;
+      console.log("reached max snowballs (20 balls)");
+    }
     if (lastBall[0]?.x === data[0].x) {
       // なにもしない
     } else {
@@ -80,11 +87,11 @@ export const Game = (isSolo = false) => {
   const playerScale = 30;
   const ballRadius = 14;
   const generateSnowBallTicks = 35;
-  const requestSnowBallTicksDown = 40;
+  const requestSnowBallTicksDown = 10;
   // 初期間隔
-  let requestSnowBallTicks = 3 * 150;
+  let requestSnowBallTicks = 300;
   // 最小間隔
-  const requestSnowBallTicksMin = 100;
+  const requestSnowBallTicksMin = 70;
   const emitPositionTicks = 3;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
@@ -516,6 +523,13 @@ export const Game = (isSolo = false) => {
           requestSnowBallTicks - requestSnowBallTicksDown,
           requestSnowBallTicksMin
         );
+        if (
+          requestSnowBallTicks == requestSnowBallTicksMin &&
+          !reachedMaxSpeed
+        ) {
+          console.log("reached max speed");
+          reachedMaxSpeed = true;
+        }
         tickRequestFallSnowBall(++snowBallCount);
       }
     }
