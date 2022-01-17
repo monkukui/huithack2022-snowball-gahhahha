@@ -25,9 +25,7 @@ export const Game = (isSolo = false) => {
       // なにもしない
     } else {
       lastBall = data;
-      // console.log(data.length)
       data.forEach((s) => {
-        console.log(s);
         const { x, y } = s;
         syncGenerateSnowball(x, y);
       });
@@ -82,9 +80,11 @@ export const Game = (isSolo = false) => {
   const playerScale = 30;
   const ballRadius = 14;
   const generateSnowBallTicks = 35;
-  let requestSnowBallTicks = 3 * 150;
   const requestSnowBallTicksDown = 40;
-  const requestSnowBallTicksMin = 150;
+  // 初期間隔
+  let requestSnowBallTicks = 3 * 150;
+  // 最小間隔
+  const requestSnowBallTicksMin = 100;
   const emitPositionTicks = 3;
   const floorScale = 200;
   const snowballSpeedFactor = 1.5;
@@ -100,7 +100,6 @@ export const Game = (isSolo = false) => {
 
   const makeFloor = () => {
     const geometry = new PlaneGeometry(floorScale, floorScale);
-
     const mesh = new Mesh(geometry, materialFloor);
     mesh.name = "floor";
     scene.add(mesh);
@@ -355,6 +354,9 @@ export const Game = (isSolo = false) => {
     }
   };
 
+  const shadowGeometry = new CircleGeometry(ballRadius, 32);
+  const shadowMaterial = materialShadow;
+
   const tickSnowballsAndShadow = () => {
     const deleteShadow = () => {
       var shadows = scene.children.filter(
@@ -373,7 +375,7 @@ export const Game = (isSolo = false) => {
           ((snowBallInitialZ - ball.position.z + 1) / 20) * snowballSpeedFactor;
         if (ball.position.z < 0) {
           scene.remove(ball);
-          if (!gamePlaying) {
+          if (gamePlaying) {
             _id("point").innerHTML = parseInt(_id("point").innerHTML) + 10;
           }
         }
@@ -381,9 +383,7 @@ export const Game = (isSolo = false) => {
       move();
 
       const makeShadow = () => {
-        const geometry = new CircleGeometry(ballRadius, 32);
-        const material = materialShadow;
-        const shadow = new Mesh(geometry, material);
+        const shadow = new Mesh(shadowGeometry, shadowMaterial);
         shadow.name = "snowballShadow";
         shadow.position.x = ball.position.x;
         shadow.position.y = ball.position.y;
@@ -456,14 +456,16 @@ export const Game = (isSolo = false) => {
     enemyLastY = y;
   };
 
+  // generate geometry, material first for performance
+  const snowBallgeometry = new SphereGeometry(
+    ballRadius,
+    snowballMeshQuality,
+    snowballMeshQuality
+  );
+  const snowBallmaterial = new MeshBasicMaterial({ color: snowColorCode });
+
   const syncGenerateSnowball = (x, y) => {
-    var geometry = new SphereGeometry(
-      ballRadius,
-      snowballMeshQuality,
-      snowballMeshQuality
-    );
-    var material = new MeshBasicMaterial({ color: snowColorCode });
-    var sphere = new Mesh(geometry, material);
+    var sphere = new Mesh(snowBallgeometry, snowBallmaterial);
     sphere.position.x = x;
     sphere.position.y = y;
     sphere.position.z = snowBallInitialZ;
@@ -486,7 +488,11 @@ export const Game = (isSolo = false) => {
     }
   };
 
-  let count = 0;
+  const tickRequestFallSnowBall = (count) => {
+    socket.emit("requestFall", { room: room, count: count });
+  };
+
+  let snowBallCount = 0; // 何ターン目か。
 
   window.gameRAFId = "";
   function animate() {
@@ -501,7 +507,6 @@ export const Game = (isSolo = false) => {
     // if (frameCount % generateSnowBallTicks === 0) {
     //   tickGenerateSnowBalls();
     // }
-    let snowBallCount = 0; // 何ターン目か。
 
     // if (frameCount % requestSnowBallTicks === 0) {
     if (snowballFallCount >= requestSnowBallTicks) {
@@ -511,8 +516,7 @@ export const Game = (isSolo = false) => {
           requestSnowBallTicks - requestSnowBallTicksDown,
           requestSnowBallTicksMin
         );
-        tickRequestFallSnowBall(snowBallCount);
-        snowBallCount++;
+        tickRequestFallSnowBall(++snowBallCount);
       }
     }
     tickSnowballsAndShadow();
@@ -524,9 +528,6 @@ export const Game = (isSolo = false) => {
     renderer.render(scene, camera);
   }
   animate();
-  const tickRequestFallSnowBall = (count) => {
-    socket.emit("requestFall", { room: room, count: count });
-  };
 };
 
 window.game = Game;
