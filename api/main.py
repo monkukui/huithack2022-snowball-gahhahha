@@ -91,10 +91,10 @@ async def join(sid, *args, **kwargs):
 
 @app.sio.on('startGameRequest')
 async def gameRequested(socket, req):
-    print(socket, req)
-    # {'host': {'name': 'あああ', 'socketId': 'F9GWXPwIg99fFogDAAAB'}, 'guest': {'name': 'あああ', 'socketId': 'am0i2xgq1Tyb8RctAAAD'}}
     await sio.emit('start', to=req["host"]["socketId"])
-    await sio.emit('start', to=req["guest"]["socketId"])
+    if(req["guest"]["socketId"]):
+        await sio.emit('start', to=req["guest"]["socketId"])
+
 
 opponentType = {
     "host": "guest",
@@ -121,7 +121,7 @@ async def syncPos(socket, req):
 
 
 def generate_snowballs_from_count(count):
-    c = 4
+    c = count//5 + 3
     res = []
     for i in range(c):
         res.append({
@@ -137,15 +137,18 @@ async def requestFall(socket, req):  # roomくる前提
     to1 = req["room"][opponentType[playerType]]["socketId"]
     to2 = req["room"][playerType]["socketId"]
     res = generate_snowballs_from_count(req["count"])
-    await sio.emit("fall", {"data": res}, to=to1)
-    await sio.emit("fall", {"data": res}, to=to2)
+    if(to1):
+        await sio.emit("fall", {"data": res}, to=to1)
+    if(to2):
+        await sio.emit("fall", {"data": res}, to=to2)
 
 
 @app.sio.on("over")
 async def over(socket, req):
     playerType = getPlayerType(socket, req)
     to = req["room"][opponentType[playerType]]["socketId"]
-    await sio.emit('over', to=to)
+    if(to):
+        await sio.emit('over', to=to)
 
 
 @app.sio.on('connect')
