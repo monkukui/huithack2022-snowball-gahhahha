@@ -121,14 +121,22 @@ async def syncPos(socket, req):
 
 
 def generate_snowballs_from_count(count):
-    c = count//5 + 3
-    res = []
-    for i in range(c):
-        res.append({
-            "x": int(random.random() * (200 - 30) - 85),
-            "y": int(random.random() * (200 - 30) - 85)
-        })
-    return res
+    MAX_SNOWBALLS = 30
+    c = min(count//4 + 3, MAX_SNOWBALLS)
+    coords = [-90+5, -70, -50, -30, -10, 10, 30, 50, 70, 90-5]
+    seen = set()
+    result = []
+    while len(result) <= c:
+        random_x_y = {
+            "x": coords[random.randint(0, 10-1)],
+            "y": coords[random.randint(0, 10-1)],
+        }
+        key = (random_x_y['x'], random_x_y['y'])
+        if key in seen:
+            continue
+        result.append(random_x_y)
+        seen.add(key)
+    return result
 
 
 @app.sio.on('requestFall')
